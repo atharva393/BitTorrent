@@ -21,7 +21,7 @@ public class Peer {
 	}
 
 	private void startServer(PeerInfo peerInfo) {
-		Thread server = new Thread(new Server(peerInfo.id, peerInfo.port, connectionMap));
+		Thread server = new Thread(new Server(peerInfo.id, peerInfo.port, connectionMap, fileManager));
 		server.start();
 	}
 	
@@ -37,7 +37,7 @@ public class Peer {
 		SocketDetails sd = peer.getSocketDetails(); 
 		OutputStream outputStream = sd.out;
 		byte[] handshakeMessage;
-		byte[] bitFieldMessage;
+		
 		try {
 			handshakeMessage = HandshakeMessage.createHandshakeMessage(peer.getPeerInfo().id);
 			outputStream.write(handshakeMessage);
@@ -45,12 +45,12 @@ public class Peer {
 			sd.in.read(response);
 			System.out.println(new String(response));
 			if(HandshakeMessage.getPeerID_Handshake_Message(response) == peer.getPeerInfo().id){
-				
-				if(!fileManager.getCustomBitField().getBitSet().isEmpty()) {
-					bitFieldMessage = BitFieldMessage.createBitFieldMessage(fileManager.getCustomBitField().getBitSet().toByteArray());
+			/*	if(!this.fileManager.getCustomBitField().getBitSet().isEmpty()) {
+					bitFieldMessage = BitFieldMessage.createBitFieldMessage(this.fileManager.getCustomBitField().getBitSet().toByteArray());
 					outputStream.write(bitFieldMessage);
-				}
-				
+				}*/
+				Thread t = new Thread(new MessageReceiver(sd.requestSocket, fileManager));
+				t.start();
 			}
 			
 			System.out.println("hand shake msg sent" + peer.getPeerInfo().id);

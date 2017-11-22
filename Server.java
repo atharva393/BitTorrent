@@ -8,12 +8,14 @@ import java.io.*;
 public class Server implements Runnable{
 	private ServerSocket welcomingSocket;
 	HashMap<Integer, Neighbor> connectionMap;
+	FileManager fileManager;
 	int peerId;
-	public Server(int peerId, int sPort, HashMap<Integer, Neighbor> connectionMap){
+	public Server(int peerId, int sPort, HashMap<Integer, Neighbor> connectionMap, FileManager fileManager){
 		try{
 			this.peerId = peerId;
 			this.connectionMap = connectionMap;
 			welcomingSocket = new ServerSocket(sPort);
+			this.fileManager = fileManager;
 		}
 		catch(Exception e){
 			System.out.println("error creating server");
@@ -37,7 +39,7 @@ public class Server implements Runnable{
 	public void run() {
 		Socket connectionSocket = null;
 		System.out.println("server is running");
-		byte[] message;
+
 		try{
 			while(true)
 			{
@@ -53,7 +55,7 @@ public class Server implements Runnable{
 				System.out.println("Receive message: " + new String(msg, "US-ASCII") + " from client ");
 				//send hand shake msg
 				out.write(HandshakeMessage.createHandshakeMessage(peerId));
-				Thread t = new Thread(new MessageReceiver(connectionSocket));
+				Thread t = new Thread(new MessageReceiver(connectionSocket, fileManager));
 				t.start();
 
 			}
