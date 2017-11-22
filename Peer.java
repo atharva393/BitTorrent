@@ -46,8 +46,8 @@ public class Peer {
 			System.out.println(new String(response));
 			if(HandshakeMessage.getPeerID_Handshake_Message(response) == peer.getPeerInfo().id){
 				
-				if(!fileManager.getBitSet().isEmpty()) {
-					bitFieldMessage = BitFieldMessage.createBitFieldMessage(fileManager.getBitSet().toByteArray());
+				if(!fileManager.getCustomBitField().getBitSet().isEmpty()) {
+					bitFieldMessage = BitFieldMessage.createBitFieldMessage(fileManager.getCustomBitField().getBitSet().toByteArray());
 					outputStream.write(bitFieldMessage);
 				}
 				
