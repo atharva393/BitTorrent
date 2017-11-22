@@ -55,7 +55,7 @@ public class Server implements Runnable{
 				System.out.println("Receive message: " + new String(msg, "US-ASCII") + " from client ");
 				//send hand shake msg
 				out.write(HandshakeMessage.createHandshakeMessage(peerId));
-				Thread t = new Thread(new MessageReceiver(connectionSocket, fileManager));
+				Thread t = new Thread(new MessageHandler(connectionSocket, fileManager));
 				t.start();
 
 			}

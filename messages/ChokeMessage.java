@@ -1,14 +1,14 @@
 package messages;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 public class ChokeMessage {
-	
+
 	final int messageType = 0;
 	final int messageTypeLen = 1;
-	
-	byte[] create_Handshake_Message() throws IOException{
+
+	byte[] create_Handshake_Message() throws IOException {
 		ByteArrayOutputStream msgStream = new ByteArrayOutputStream();
 		byte[] messageLenField = Helper.getBytesOfGivenSizeAndMessage(messageTypeLen, 4);
 		msgStream.write(messageLenField);

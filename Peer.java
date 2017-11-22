@@ -3,7 +3,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import messages.BitFieldMessage;
 import messages.HandshakeMessage;
 
 public class Peer {
@@ -49,7 +48,7 @@ public class Peer {
 					bitFieldMessage = BitFieldMessage.createBitFieldMessage(this.fileManager.getCustomBitField().getBitSet().toByteArray());
 					outputStream.write(bitFieldMessage);
 				}*/
-				Thread t = new Thread(new MessageReceiver(sd.requestSocket, fileManager));
+				Thread t = new Thread(new MessageHandler(sd.requestSocket, fileManager));
 				t.start();
 			}
 			

@@ -1,5 +1,3 @@
-import java.util.BitSet;
-
 public class FileManager {
 
 	private CustomBitField customBitField;
