@@ -3,6 +3,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import messages.BitFieldMessage;
 import messages.HandshakeMessage;
 
 public class Peer {
@@ -36,7 +37,7 @@ public class Peer {
 		SocketDetails sd = peer.getSocketDetails(); 
 		OutputStream outputStream = sd.out;
 		byte[] handshakeMessage;
-		
+		byte[] bitFieldMessage;
 		try {
 			handshakeMessage = HandshakeMessage.createHandshakeMessage(peer.getPeerInfo().id);
 			outputStream.write(handshakeMessage);
@@ -44,12 +45,13 @@ public class Peer {
 			sd.in.read(response);
 			System.out.println(new String(response));
 			if(HandshakeMessage.getPeerID_Handshake_Message(response) == peer.getPeerInfo().id){
-			/*	if(!this.fileManager.getCustomBitField().getBitSet().isEmpty()) {
+
+				Thread t = new Thread(new MessageHandler(sd.requestSocket, fileManager, peer.getPeerInfo().id, connectionMap));
+				t.start();
+				if(!this.fileManager.getCustomBitField().getBitSet().isEmpty()) {
 					bitFieldMessage = BitFieldMessage.createBitFieldMessage(this.fileManager.getCustomBitField().getBitSet().toByteArray());
 					outputStream.write(bitFieldMessage);
-				}*/
-				Thread t = new Thread(new MessageHandler(sd.requestSocket, fileManager));
-				t.start();
+				}
 			}
 			
 			System.out.println("hand shake msg sent" + peer.getPeerInfo().id);

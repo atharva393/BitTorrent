@@ -5,10 +5,10 @@ import java.io.IOException;
 
 public class NotInterestedMessage {
 
-	final int messageType = 3;
-	final int messageTypeLen = 1;
+	final static int messageType = 3;
+	final static int messageTypeLen = 1;
 
-	byte[] create_NotInterested_Message() throws IOException {
+	public static byte[] createNotInterestedMessage() throws IOException {
 		ByteArrayOutputStream msgStream = new ByteArrayOutputStream();
 		byte[] messageLenField = Helper.getBytesOfGivenSizeAndMessage(messageTypeLen, 4);
 		msgStream.write(messageLenField);

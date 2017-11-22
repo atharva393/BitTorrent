@@ -2,12 +2,6 @@ import messages.BitFieldMessage;
 
 public class Neighbor {
 	private PeerInfo peerInfo;
-	public PeerInfo getPeerInfo() {
-		return peerInfo;
-	}
-	public void setPeerInfo(PeerInfo peerInfo) {
-		this.peerInfo = peerInfo;
-	}
 	private int noPrevPiecesRcvd;
 	private BitFieldMessage bitField;	
 	//private PeerConn connection;
@@ -17,13 +11,30 @@ public class Neighbor {
 	private boolean isInterested;
 	private boolean amInterested;
 	
+	Neighbor(){
+		this.amInterested = false;
+		this.isChokedbyMe = false;
+		this.isChokingMe = true;
+		this.isInterested = false;
+	}
+	
+	public PeerInfo getPeerInfo() {
+		return peerInfo;
+	}
+	
+	public void setPeerInfo(PeerInfo peerInfo) {
+		this.peerInfo = peerInfo;
+	}
+	
 	public Neighbor(PeerInfo peerInfo) {
 		this.peerInfo = peerInfo;
 		this.setSocketDetails(new SocketDetails(this.peerInfo));
 	}
+	
 	public SocketDetails getSocketDetails() {
 		return socketDetails;
 	}
+	
 	public void setSocketDetails(SocketDetails socketDetails) {
 		this.socketDetails = socketDetails;
 	}
