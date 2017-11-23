@@ -1,6 +1,6 @@
 /**
  * All the constants are stored in this file. 
- * @author Aman, Aneesh and Atharva
+ * @author Aman, Aneesh & Atharva
  *
  */
 public class Constants {

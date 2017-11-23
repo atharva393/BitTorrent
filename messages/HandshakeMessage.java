@@ -16,7 +16,7 @@ public class HandshakeMessage {
 		return msgStream.toByteArray();
 	}
 	
-	public static int getPeerID_Handshake_Message(byte[] message){	    
+	public static int getPeerID_Handshake_Message(byte[] message){
 	    return ByteBuffer.wrap(message, 28, 4).getInt();
 	}
 	

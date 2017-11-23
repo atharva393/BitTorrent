@@ -6,6 +6,8 @@ import java.util.BitSet;
  */
 public class CustomBitField {
 	private BitSet bitSet = null;
+	private int numberOfPieces = 0;
+	
 	public BitSet getBitSet() {
 		return bitSet;
 	}
@@ -14,10 +16,9 @@ public class CustomBitField {
 		this.bitSet = bitSet;
 	}
 
-	private int numberOfPieces = 0;
 
 	public CustomBitField(int numberOfPieces) {
-		bitSet = new BitSet(numberOfPieces);
+		this.bitSet = new BitSet(numberOfPieces);
 		this.numberOfPieces = numberOfPieces;
 	}
 	

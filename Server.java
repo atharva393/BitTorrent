@@ -11,11 +11,11 @@ public class Server implements Runnable{
 	private ServerSocket welcomingSocket;
 	HashMap<Integer, Neighbor> connectionMap;
 	FileManager fileManager;
-	int peerId;
+	int myPeerId;
 	
 	public Server(int peerId, int sPort, HashMap<Integer, Neighbor> connectionMap, FileManager fileManager){
 		try{
-			this.peerId = peerId;
+			this.myPeerId = peerId;
 			this.connectionMap = connectionMap;
 			welcomingSocket = new ServerSocket(sPort);
 			this.fileManager = fileManager;
@@ -53,11 +53,11 @@ public class Server implements Runnable{
 				byte[] msg = new byte[32];	
 				inputStream.read(msg, 0, 32);
 				
-				int peerId = HandshakeMessage.validateHandshakeMsg(msg);
+				int neighborPeerId = HandshakeMessage.validateHandshakeMsg(msg);
 				System.out.println("Receive message: " + new String(msg, "US-ASCII") + " from client ");
 				//send hand shake msg
-				outputStream.write(HandshakeMessage.createHandshakeMessage(peerId));
-				Thread t = new Thread(new MessageHandler(connectionSocket, fileManager, peerId, connectionMap));
+				outputStream.write(HandshakeMessage.createHandshakeMessage(myPeerId));
+				Thread t = new Thread(new MessageHandler(connectionSocket, fileManager, neighborPeerId, connectionMap));
 				t.start();
 				byte[] bitFieldMsg;
 				if(!this.fileManager.getCustomBitField().getBitSet().isEmpty()) {

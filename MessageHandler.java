@@ -32,15 +32,22 @@ public class MessageHandler implements Runnable {
 			outputStream = socket.getOutputStream();
 			
 			while(true) {
-				byte[] bitFieldMsgLengthArray = new byte[4];
+				System.out.println("server's msg handler running");
 				int msgLength;
 				int messageType;
 				
+				byte[] bitFieldMsgLengthArray = new byte[4];
 				inputStream.read(bitFieldMsgLengthArray, 0, 4);
 				msgLength = ByteBuffer.wrap(bitFieldMsgLengthArray, 0, 4).getInt();
+				//System.out.println(msgLength);
+				
+				byte[] msgType = new byte[1];
+				inputStream.read(msgType, 0, 1);
+				messageType = ByteBuffer.wrap(msgType, 0, 1).get();
+				
 				byte[] inputStreamByte = new byte[msgLength];
-				messageType = inputStream.read(inputStreamByte, 0, 1);
 				inputStream.read(inputStreamByte, 0, msgLength);
+				System.out.println("messageType : " + messageType);
 				
 				switch(messageType) {
 				case 0:
@@ -77,18 +84,17 @@ public class MessageHandler implements Runnable {
 		System.out.println("I am interested " + interested);
 		try {
 			if(interested){
-				connectionMap.get(neighborPeerId).equals(true);
+				connectionMap.get(neighborPeerId).setAmInterested(true);
 				byte[] interestedMessage = InterestedMessage.createInterestedMessage();
 				System.out.println("sending interestd msg");
 				outputStream.write(interestedMessage);
 			} else {
-				connectionMap.get(neighborPeerId).equals(false);
+				connectionMap.get(neighborPeerId).setAmInterested(false);
 				byte[] notInterestedMessage = NotInterestedMessage.createNotInterestedMessage();
 				System.out.println("sending not interestd msg");
 				outputStream.write(notInterestedMessage);
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

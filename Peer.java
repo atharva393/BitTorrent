@@ -39,7 +39,7 @@ public class Peer {
 		byte[] handshakeMessage;
 		byte[] bitFieldMessage;
 		try {
-			handshakeMessage = HandshakeMessage.createHandshakeMessage(peer.getPeerInfo().id);
+			handshakeMessage = HandshakeMessage.createHandshakeMessage(peerInfo.id);
 			outputStream.write(handshakeMessage);
 			byte[] response = new byte[32];
 			sd.in.read(response);
