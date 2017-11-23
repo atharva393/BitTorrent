@@ -1,5 +1,8 @@
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class PeerProcess {
@@ -12,12 +15,32 @@ public class PeerProcess {
 		// TODO Auto-generated method stub
 		int thisPeerId = Integer.parseInt(args[0]);
 		PeerProcess p = new PeerProcess();
-		p.initializeMyPeer(thisPeerId, "PeerInfo.cfg");
+		Map<Integer, PeerInfo> peerInfoMap = p.populatePeerInfoMap("PeerInfo.cfg");
+		p.initializeMyPeer(thisPeerId, "PeerInfo.cfg", peerInfoMap);
 		// start connecting
 
 	}
 
-	private void initializeMyPeer(int thisPeerId, String peerInfoFile) {
+	private Map<Integer, PeerInfo> populatePeerInfoMap(String peerInfoFile) {
+		Map<Integer, PeerInfo> peerInfoMap = new HashMap<>();
+		Scanner sc;
+		try {
+			sc = new Scanner(new File(peerInfoFile));
+			
+			while (sc.hasNextLine()) {
+				String[] splittedLine = sc.nextLine().split(" ");
+				PeerInfo peerInfo = new PeerInfo(Integer.parseInt(splittedLine[0]), splittedLine[1],
+						Integer.parseInt(splittedLine[2]), splittedLine[3].equals("1"));
+				peerInfoMap.put(peerInfo.id, peerInfo);
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	private void initializeMyPeer(int thisPeerId, String peerInfoFile, Map<Integer, PeerInfo> peerInfoMap) {
 		ArrayList<PeerInfo> peersToConnect = new ArrayList<>();
 		try {
 			Scanner sc = new Scanner(new File(peerInfoFile));
@@ -28,7 +51,7 @@ public class PeerProcess {
 				if (peerInfo.id != thisPeerId) {
 					peersToConnect.add(peerInfo);
 				} else {
-					peer = new Peer(peerInfo, peersToConnect);
+					peer = new Peer(peerInfo, peersToConnect,peerInfoMap);
 					break;
 				}
 			}

@@ -1,3 +1,6 @@
+import java.io.IOException;
+import java.net.Socket;
+
 import messages.BitFieldMessage;
 
 public class Neighbor {
@@ -5,19 +8,15 @@ public class Neighbor {
 	private int noPrevPiecesRcvd;
 	private BitFieldMessage bitField;	
 	//private PeerConn connection;
-	private SocketDetails socketDetails;
+	//private SocketDetails socketDetails;
+	private Socket requestSocket;
+
 	private boolean isChokingMe;
 	private boolean isChokedbyMe;
 	private boolean isInterested;
 	private boolean amInterested;
 	
-	Neighbor(){
-		this.amInterested = false;
-		this.isChokedbyMe = false;
-		this.isChokingMe = true;
-		this.isInterested = false;
-	}
-	
+
 	public PeerInfo getPeerInfo() {
 		return peerInfo;
 	}
@@ -28,16 +27,36 @@ public class Neighbor {
 	
 	public Neighbor(PeerInfo peerInfo) {
 		this.peerInfo = peerInfo;
-		this.setSocketDetails(new SocketDetails(this.peerInfo));
+		//this.setSocketDetails(new SocketDetails(this.peerInfo));
+		try {
+			this.requestSocket = new Socket(peerInfo.name, peerInfo.port);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		this.amInterested = false;
+		this.isChokedbyMe = false;
+		this.isChokingMe = true;
+		this.isInterested = false;
 	}
 	
-	public SocketDetails getSocketDetails() {
+	public Neighbor(PeerInfo peerInfo, Socket connectionSocket) {
+		this.peerInfo = peerInfo;
+		//this.setSocketDetails(new SocketDetails(this.peerInfo));
+		this.requestSocket = connectionSocket;
+		this.amInterested = false;
+		this.isChokedbyMe = false;
+		this.isChokingMe = true;
+		this.isInterested = false;
+	}
+	
+/*	public SocketDetails getSocketDetails() {
 		return socketDetails;
 	}
-	
 	public void setSocketDetails(SocketDetails socketDetails) {
 		this.socketDetails = socketDetails;
-	}
+	}*/
+	
 	public boolean isChokingMe() {
 		return isChokingMe;
 	}
@@ -73,5 +92,11 @@ public class Neighbor {
 	}
 	public void setNoPrevPiecesRcvd(int noPrevPiecesRcvd) {
 		this.noPrevPiecesRcvd = noPrevPiecesRcvd;
+	}
+	public Socket getRequestSocket() {
+		return requestSocket;
+	}
+	public void setRequestSocket(Socket requestSocket) {
+		this.requestSocket = requestSocket;
 	}
 }

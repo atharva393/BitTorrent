@@ -1,5 +1,6 @@
 import java.net.*;
 import java.util.HashMap;
+import java.util.Map;
 
 import messages.BitFieldMessage;
 import messages.HandshakeMessage;
@@ -9,16 +10,17 @@ import java.io.*;
 public class Server implements Runnable{
 	
 	private ServerSocket welcomingSocket;
-	HashMap<Integer, Neighbor> connectionMap;
+	Map<Integer, Neighbor> connectionMap;
 	FileManager fileManager;
 	int myPeerId;
-	
-	public Server(int peerId, int sPort, HashMap<Integer, Neighbor> connectionMap, FileManager fileManager){
+	Map<Integer, PeerInfo> peerInfoMap;
+	public Server(int peerId, int sPort, HashMap<Integer, Neighbor> connectionMap, FileManager fileManager, Map<Integer, PeerInfo> peerInfoMap){
 		try{
 			this.myPeerId = peerId;
 			this.connectionMap = connectionMap;
-			welcomingSocket = new ServerSocket(sPort);
+			this.welcomingSocket = new ServerSocket(sPort);
 			this.fileManager = fileManager;
+			this.peerInfoMap = peerInfoMap;
 		}
 		catch(Exception e){
 			System.out.println("error creating server");
@@ -49,11 +51,12 @@ public class Server implements Runnable{
 				connectionSocket = welcomingSocket.accept();
 				OutputStream outputStream = connectionSocket.getOutputStream();
 				InputStream inputStream = connectionSocket.getInputStream();
-							
-				byte[] msg = new byte[32];	
+				
+				byte[] msg = new byte[32];
 				inputStream.read(msg, 0, 32);
 				
 				int neighborPeerId = HandshakeMessage.validateHandshakeMsg(msg);
+				connectionMap.put(neighborPeerId, new Neighbor(peerInfoMap.get(neighborPeerId), connectionSocket));
 				System.out.println("Receive message: " + new String(msg, "US-ASCII") + " from client ");
 				//send hand shake msg
 				outputStream.write(HandshakeMessage.createHandshakeMessage(myPeerId));

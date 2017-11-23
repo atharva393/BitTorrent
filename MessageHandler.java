@@ -4,7 +4,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.BitSet;
-import java.util.HashMap;
+import java.util.Map;
 
 import messages.InterestedMessage;
 import messages.NotInterestedMessage;
@@ -15,9 +15,9 @@ public class MessageHandler implements Runnable {
 	OutputStream outputStream;
 	FileManager fileManager;
 	int neighborPeerId;
-	HashMap<Integer,Neighbor> connectionMap;
+	Map<Integer,Neighbor> connectionMap;
 	
-	MessageHandler(Socket connectionSocket, FileManager fileManager, int peerId,  HashMap<Integer,Neighbor> connectionMap) {
+	MessageHandler(Socket connectionSocket, FileManager fileManager, int peerId, Map<Integer,Neighbor> connectionMap) {
 		socket = connectionSocket;
 		this.fileManager = fileManager;
 		this.neighborPeerId = peerId;
