@@ -54,10 +54,12 @@ public class MessageHandler implements Runnable {
 
 				switch (messageType) {
 				case 0:
+					System.out.println("choking msg received from " + neighborPeerId);
 					handleChokeMsg(inputStreamByte);
 					break;
 				case 1:
-					handleUnChokeMsg(inputStreamByte);
+					System.out.println("unchoked msg received from " + neighborPeerId);
+					handleUnChokeMsg();
 					break;
 				case 2:
 					System.out.println("received interested msg from " + neighborPeerId);
@@ -73,8 +75,10 @@ public class MessageHandler implements Runnable {
 					handleBitFieldMsg(BitSet.valueOf(inputStreamByte));
 					break;
 				case 6:
+					System.out.println("Request msg received by " + neighborPeerId);
 					break;
 				case 7:
+					System.out.println("Piece received from " + neighborPeerId);
 					handlePieceMsg(inputStreamByte);
 					break;
 				}
@@ -107,7 +111,7 @@ public class MessageHandler implements Runnable {
 		}
 	}
 
-	private void handleUnChokeMsg(byte[] inputStreamByte) {
+	private void handleUnChokeMsg() {
 		connectionMap.get(neighborPeerId).setChokingMe(false);
 		if(connectionMap.get(neighborPeerId).isAmInterested()) {
 			sendPieceRequest();

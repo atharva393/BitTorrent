@@ -3,6 +3,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import messages.BitFieldMessage;
@@ -10,16 +11,21 @@ import messages.HandshakeMessage;
 
 public class Peer {
 
-	HashMap<Integer, Neighbor> connectionMap;
+	private HashMap<Integer, Neighbor> connectionMap;
 	PeerInfo peerInfo;
 	FileManager fileManager;
 	Map<Integer, PeerInfo> peerInfoMap;
-
+	UnchokeCycle unchokeCycle;
+	private List<Neighbor> interestedNeighbors;
+	private List<Integer> currentlyUnchokedNeighborIds;
+	
 	Peer(PeerInfo peerInfo, ArrayList<PeerInfo> peersToConnect, Map<Integer, PeerInfo> peerInfoMap) {
 		this.peerInfo = peerInfo;
 		connectionMap = new HashMap<>();
 		fileManager = new FileManager(peerInfo.hasFile);
 		this.peerInfoMap = peerInfoMap;
+		this.setInterestedNeighbors(new ArrayList<Neighbor>());
+		this.unchokeCycle = new UnchokeCycle(this);
 		startServer(peerInfo);
 		createConnections(peersToConnect);
 	}
@@ -27,6 +33,8 @@ public class Peer {
 	private void startServer(PeerInfo peerInfo) {
 		Thread server = new Thread(new Server(peerInfo.id, peerInfo.port, connectionMap, fileManager, peerInfoMap));
 		server.start();
+		//start unchokecycle
+		unchokeCycle.beginCycle();
 	}
 
 	void createConnections(ArrayList<PeerInfo> peersToConnectTo) {
@@ -35,7 +43,15 @@ public class Peer {
 			sendHandshakeMsg(connectionMap.get(peerInfo.id));
 		}
 	}
+	
+	public HashMap<Integer, Neighbor> getConnectionMap() {
+		return connectionMap;
+	}
 
+	public void setConnectionMap(HashMap<Integer, Neighbor> connectionMap) {
+		this.connectionMap = connectionMap;
+	}
+	
 	private void sendHandshakeMsg(Neighbor peer) {
 		Socket socket = peer.getRequestSocket();
 		OutputStream outputStream = null;
@@ -69,5 +85,21 @@ public class Peer {
 			e.printStackTrace();
 			System.out.println("error while sending hand shake msg to" + peer.getPeerInfo().id);
 		}
+	}
+
+	public List<Neighbor> getInterestedNeighbors() {
+		return interestedNeighbors;
+	}
+
+	public void setInterestedNeighbors(List<Neighbor> interestedNeighbors) {
+		this.interestedNeighbors = interestedNeighbors;
+	}
+
+	public List<Integer> getCurrentlyUnchokedNeighborIds() {
+		return currentlyUnchokedNeighborIds;
+	}
+
+	public void setCurrentlyUnchokedNeighborIds(List<Integer> currentlyUnchokedNeighborIds) {
+		this.currentlyUnchokedNeighborIds = currentlyUnchokedNeighborIds;
 	}
 }

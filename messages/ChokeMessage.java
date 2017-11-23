@@ -5,10 +5,10 @@ import java.io.IOException;
 
 public class ChokeMessage {
 
-	final int messageType = 0;
-	final int messageTypeLen = 1;
+	final static int messageType = 0;
+	final static int messageTypeLen = 1;
 
-	byte[] create_Handshake_Message() throws IOException {
+	public static byte[] createChokeMessage() throws IOException {
 		ByteArrayOutputStream msgStream = new ByteArrayOutputStream();
 		byte[] messageLenField = Helper.getBytesOfGivenSizeAndMessage(messageTypeLen, 4);
 		msgStream.write(messageLenField);

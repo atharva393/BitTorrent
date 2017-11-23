@@ -11,6 +11,10 @@ public class Neighbor {
 	private boolean isInterested;
 	private boolean amInterested;
 
+	private long unchokedAt;
+	private double downloadRate;
+	private int numberOfReceivedPieces;
+	
 	public PeerInfo getPeerInfo() {
 		return peerInfo;
 	}
@@ -96,5 +100,29 @@ public class Neighbor {
 
 	public void setNeighborBitField(CustomBitField neighborBitField) {
 		this.neighborBitField = neighborBitField;
+	}
+
+	public int getNumberOfReceivedPieces() {
+		return numberOfReceivedPieces;
+	}
+
+	public void setNumberOfReceivedPieces(int numberOfReceivedPieces) {
+		this.numberOfReceivedPieces = numberOfReceivedPieces;
+	}
+
+	public long getUnchokedAt() {
+		return unchokedAt;
+	}
+
+	public void setUnchokedAt(long unchokedAt) {
+		this.unchokedAt = unchokedAt;
+	}
+
+	public double getDownloadRate() {
+		return downloadRate;
+	}
+
+	public void setDownloadRate(double downloadRate) {
+		this.downloadRate = downloadRate;
 	}
 }
