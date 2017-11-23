@@ -5,9 +5,11 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.BitSet;
 import java.util.Map;
+import java.util.Random;
 
 import messages.InterestedMessage;
 import messages.NotInterestedMessage;
+import messages.RequestMessage;
 
 public class MessageHandler implements Runnable {
 	private Socket socket;
@@ -55,6 +57,7 @@ public class MessageHandler implements Runnable {
 					handleChokeMsg(inputStreamByte);
 					break;
 				case 1:
+					handleUnChokeMsg(inputStreamByte);
 					break;
 				case 2:
 					System.out.println("received interested msg from " + neighborPeerId);
@@ -63,10 +66,16 @@ public class MessageHandler implements Runnable {
 					System.out.println("received not interested msg from " + neighborPeerId);
 					break;
 				case 4:
+					handleHaveMsg(ByteBuffer.wrap(inputStreamByte, 0, 4).getInt());
 					break;
 				case 5:
 					System.out.println("calling bitfield msg handler method");
 					handleBitFieldMsg(BitSet.valueOf(inputStreamByte));
+					break;
+				case 6:
+					break;
+				case 7:
+					handlePieceMsg(inputStreamByte);
 					break;
 				}
 			}
@@ -76,11 +85,73 @@ public class MessageHandler implements Runnable {
 		}
 	}
 
-	private void handleBitFieldMsg(BitSet neighborBitSet) {
-		boolean interested = hasMissingPieces(neighborBitSet);
-		System.out.println("I am interested " + interested);
+	private void handlePieceMsg(byte[] inputStreamByte) {
+		//request map se delete krna hai
+		
+	}
+
+	private void handleHaveMsg(int index) {
+		connectionMap.get(neighborPeerId).getNeighborBitField().getBitSet().set(index);
+		
+		if(!fileManager.getCustomBitField().getBitSet().get(index)){
+			byte[] interestedMessage;
+			try {
+				interestedMessage = InterestedMessage.createInterestedMessage();
+				System.out.println("sending interestd msg");
+				outputStream.write(interestedMessage);
+				if(!connectionMap.get(neighborPeerId).isChokingMe())
+					sendPieceRequest(index);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private void handleUnChokeMsg(byte[] inputStreamByte) {
+		connectionMap.get(neighborPeerId).setChokingMe(false);
+		if(connectionMap.get(neighborPeerId).isAmInterested()) {
+			sendPieceRequest();
+		}
+	}
+
+	private void sendPieceRequest() {
+		if(connectionMap.get(neighborPeerId).isChokingMe())
+			return;
+		BitSet missingPieces = hasMissingPieces(connectionMap.get(neighborPeerId).getNeighborBitField().getBitSet());
+		int index = getRandomPieceIndex(missingPieces);
+		sendPieceRequest(index);
+	}
+
+	private void sendPieceRequest(int index){
 		try {
-			if (interested) {
+			if((!fileManager.getRequestPieceMap().containsKey(neighborPeerId)) && (!fileManager.getRequestBitset().get(index))) {
+				fileManager.getRequestBitset().set(index);
+				fileManager.getRequestPieceMap().put(neighborPeerId, index);
+				byte[] requestMsg = RequestMessage.createRequestMessage(index);
+				outputStream.write(requestMsg);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	private int getRandomPieceIndex(BitSet missingPieces) {
+		Random random = new Random();
+		int index = missingPieces.nextSetBit(random.nextInt(missingPieces.size()));
+		if(!missingPieces.isEmpty()) {
+			while(!fileManager.getRequestBitset().get(index)) {
+				index = missingPieces.nextSetBit(random.nextInt(missingPieces.size()));
+			}
+		}
+		return index;
+	}
+
+	private void handleBitFieldMsg(BitSet neighborBitSet) {
+		BitSet interested = hasMissingPieces(neighborBitSet);
+		System.out.println("I am interested " + interested);
+		connectionMap.get(neighborPeerId).getNeighborBitField().setBitSet(neighborBitSet);
+		
+		try {
+			if (!interested.isEmpty()) {
 				connectionMap.get(neighborPeerId).setAmInterested(true);
 				byte[] interestedMessage = InterestedMessage.createInterestedMessage();
 				System.out.println("sending interestd msg");
@@ -97,10 +168,10 @@ public class MessageHandler implements Runnable {
 	}
 
 	private void handleChokeMsg(byte[] inputStreamByte) {
-
+		//request map se delete krna hai
 	}
 
-	private boolean hasMissingPieces(BitSet otherBitSet) {
+	private BitSet hasMissingPieces(BitSet otherBitSet) {
 
 		BitSet XORbits = (BitSet) fileManager.getCustomBitField().getBitSet().clone();
 		XORbits.xor(otherBitSet);
@@ -110,7 +181,9 @@ public class MessageHandler implements Runnable {
 
 		andBits.xor(XORbits);
 
-		return !andBits.isEmpty();
+		return andBits;
 
 	}
+	
+	
 }

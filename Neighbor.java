@@ -1,16 +1,11 @@
 import java.io.IOException;
 import java.net.Socket;
 
-import messages.BitFieldMessage;
-
 public class Neighbor {
 	private PeerInfo peerInfo;
 	private int noPrevPiecesRcvd;
-	private BitFieldMessage bitField;
-	// private PeerConn connection;
-	// private SocketDetails socketDetails;
 	private Socket requestSocket;
-
+	private CustomBitField neighborBitField;
 	private boolean isChokingMe;
 	private boolean isChokedbyMe;
 	private boolean isInterested;
@@ -78,13 +73,6 @@ public class Neighbor {
 		this.amInterested = amInterested;
 	}
 
-	public BitFieldMessage getBitField() {
-		return bitField;
-	}
-
-	public void setBitField(BitFieldMessage bitField) {
-		this.bitField = bitField;
-	}
 
 	public int getNoPrevPiecesRcvd() {
 		return noPrevPiecesRcvd;
@@ -100,5 +88,13 @@ public class Neighbor {
 
 	public void setRequestSocket(Socket requestSocket) {
 		this.requestSocket = requestSocket;
+	}
+
+	public CustomBitField getNeighborBitField() {
+		return neighborBitField;
+	}
+
+	public void setNeighborBitField(CustomBitField neighborBitField) {
+		this.neighborBitField = neighborBitField;
 	}
 }
