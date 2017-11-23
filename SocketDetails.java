@@ -4,7 +4,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 public class SocketDetails {
-	OutputStream out;        //stream write to the socket
+	OutputStream out;
  	InputStream in;
  	Socket requestSocket;
  	
@@ -16,7 +16,6 @@ public class SocketDetails {
 			out.flush();
 			in = requestSocket.getInputStream();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
 	}

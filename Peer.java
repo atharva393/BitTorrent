@@ -14,13 +14,13 @@ public class Peer {
 	PeerInfo peerInfo;
 	FileManager fileManager;
 	Map<Integer, PeerInfo> peerInfoMap;
-	
-	Peer(PeerInfo peerInfo, ArrayList<PeerInfo> peersToConnect, Map<Integer, PeerInfo> peerInfoMap){
+
+	Peer(PeerInfo peerInfo, ArrayList<PeerInfo> peersToConnect, Map<Integer, PeerInfo> peerInfoMap) {
 		this.peerInfo = peerInfo;
 		connectionMap = new HashMap<>();
 		fileManager = new FileManager(peerInfo.hasFile);
 		this.peerInfoMap = peerInfoMap;
-		startServer(peerInfo);	
+		startServer(peerInfo);
 		createConnections(peersToConnect);
 	}
 
@@ -28,23 +28,20 @@ public class Peer {
 		Thread server = new Thread(new Server(peerInfo.id, peerInfo.port, connectionMap, fileManager, peerInfoMap));
 		server.start();
 	}
-	
-	void createConnections(ArrayList<PeerInfo> peersToConnectTo)
-	{
-		for(PeerInfo peerInfo: peersToConnectTo) {
+
+	void createConnections(ArrayList<PeerInfo> peersToConnectTo) {
+		for (PeerInfo peerInfo : peersToConnectTo) {
 			connectionMap.put(peerInfo.id, new Neighbor(peerInfo));
 			sendHandshakeMsg(connectionMap.get(peerInfo.id));
 		}
 	}
-	
+
 	private void sendHandshakeMsg(Neighbor peer) {
-		//SocketDetails sd = peer.getSocketDetails();
-		Socket sd = peer.getRequestSocket();
+		Socket socket = peer.getRequestSocket();
 		OutputStream outputStream = null;
 		try {
-			outputStream = sd.getOutputStream();
+			outputStream = socket.getOutputStream();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		byte[] handshakeMessage;
@@ -53,22 +50,24 @@ public class Peer {
 			handshakeMessage = HandshakeMessage.createHandshakeMessage(peerInfo.id);
 			outputStream.write(handshakeMessage);
 			byte[] response = new byte[32];
-			sd.getInputStream().read(response);
-			System.out.println(new String(response));
-			if(HandshakeMessage.getPeerID_Handshake_Message(response) == peer.getPeerInfo().id){
+			socket.getInputStream().read(response);
 
-				Thread t = new Thread(new MessageHandler(sd, fileManager, peer.getPeerInfo().id, connectionMap));
+			System.out.println(new String(response));
+
+			if (HandshakeMessage.getPeerID_Handshake_Message(response) == peer.getPeerInfo().id) {
+
+				Thread t = new Thread(new MessageHandler(socket, fileManager, peer.getPeerInfo().id, connectionMap));
 				t.start();
-				if(!this.fileManager.getCustomBitField().getBitSet().isEmpty()) {
-					bitFieldMessage = BitFieldMessage.createBitFieldMessage(this.fileManager.getCustomBitField().getBitSet().toByteArray());
+				if (!this.fileManager.getCustomBitField().getBitSet().isEmpty()) {
+					bitFieldMessage = BitFieldMessage
+							.createBitFieldMessage(this.fileManager.getCustomBitField().getBitSet().toByteArray());
 					outputStream.write(bitFieldMessage);
 				}
 			}
-			
-			System.out.println("hand shake msg sent" + peer.getPeerInfo().id);
+
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("error while sending hand shake msg to" + peer.getPeerInfo().id);
-		}	
+		}
 	}
 }

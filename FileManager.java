@@ -7,7 +7,6 @@ public class FileManager {
 		return customBitField;
 	}
 
-	
 	FileManager(boolean hasFile){
 		
 		CommonConfig commonConfig = CommonConfig.getCommonProperties();

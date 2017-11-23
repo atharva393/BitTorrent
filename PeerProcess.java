@@ -12,12 +12,10 @@ public class PeerProcess {
 
 	public static void main(String[] args) throws Exception {
 
-		// TODO Auto-generated method stub
 		int thisPeerId = Integer.parseInt(args[0]);
 		PeerProcess p = new PeerProcess();
 		Map<Integer, PeerInfo> peerInfoMap = p.populatePeerInfoMap("PeerInfo.cfg");
 		p.initializeMyPeer(thisPeerId, "PeerInfo.cfg", peerInfoMap);
-		// start connecting
 
 	}
 
@@ -34,10 +32,9 @@ public class PeerProcess {
 				peerInfoMap.put(peerInfo.id, peerInfo);
 			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return null;
+		return peerInfoMap;
 	}
 
 	private void initializeMyPeer(int thisPeerId, String peerInfoFile, Map<Integer, PeerInfo> peerInfoMap) {
