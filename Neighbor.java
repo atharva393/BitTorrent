@@ -34,6 +34,7 @@ public class Neighbor {
 		this.isChokedbyMe = false;
 		this.isChokingMe = true;
 		this.isInterested = false;
+		this.neighborBitField = new CustomBitField();
 	}
 
 	public Neighbor(PeerInfo peerInfo, Socket connectionSocket) {
@@ -43,6 +44,7 @@ public class Neighbor {
 		this.isChokedbyMe = false;
 		this.isChokingMe = true;
 		this.isInterested = false;
+		this.neighborBitField = new CustomBitField();
 	}
 
 	public boolean isChokingMe() {

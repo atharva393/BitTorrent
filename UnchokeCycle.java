@@ -45,7 +45,7 @@ public class UnchokeCycle {
 		public void run() {
 			OutputStream outputStream;
 			while(!isCycleStopped()) {
-				if((System.currentTimeMillis() - previousUnchokeTime) >= unchokingTimeInterval * 1000) {
+				if((System.currentTimeMillis() - previousUnchokeTime) >= unchokingTimeInterval * 1000 && peer.getInterestedNeighbors().size()>0) {
 					List<Neighbor> newUnchokedNeighbors = selectNewUnchokedNeighbors();
 					List<Integer> currentlyUnchokedNeighbors = peer.getCurrentlyUnchokedNeighborIds();
 					List<Integer> toChokeList = new ArrayList<>(currentlyUnchokedNeighbors);
@@ -65,7 +65,9 @@ public class UnchokeCycle {
 							currentlyUnchokedNeighbors.add(n.getPeerInfo().id);
 						}
 					}
-					newUnchokedNeighbors.removeAll(toChokeList);
+					
+					currentlyUnchokedNeighbors.removeAll(toChokeList);
+					
 					for(int i: toChokeList) {
 						//send choked msg
 						try {
@@ -92,7 +94,7 @@ public class UnchokeCycle {
 		public List<Neighbor> selcteNeighborRandomly(){
 			List<Neighbor> interestedNeighborsList = peer.getInterestedNeighbors();
 			Collections.shuffle(interestedNeighborsList);
-			return interestedNeighborsList.subList(0, CommonConfig.getCommonProperties().getNumberOfPreferredNeighbors());
+			return interestedNeighborsList.subList(0, Math.min(interestedNeighborsList.size(), CommonConfig.getCommonProperties().getNumberOfPreferredNeighbors()));
 		}
 
 		private List<Neighbor> selectUnchokedNeighborsBasedOnDownloadingRate() {
