@@ -132,6 +132,8 @@ public class MessageHandler implements Runnable {
 		if(connectionMap.get(neighborPeerId).isChokingMe())
 			return;
 		BitSet missingPieces = hasMissingPieces(connectionMap.get(neighborPeerId).getNeighborBitField().getBitSet());
+		if(missingPieces.isEmpty())
+			return;
 		int index = getRandomPieceIndex(missingPieces);
 		sendPieceRequest(index);
 	}
@@ -150,9 +152,16 @@ public class MessageHandler implements Runnable {
 	}
 	private int getRandomPieceIndex(BitSet missingPieces) {
 		Random random = new Random();
-		int index = missingPieces.nextSetBit(random.nextInt(missingPieces.size()));
+		/*int randomNumber = random.nextInt(missingPieces.size());
+		System.out.println(randomNumber);
+		System.out.println(missingPieces);
+		int index = missingPieces.nextSetBit(randomNumber);
+		if(index==-1)
+			index = missingPieces.previousSetBit(randomNumber);*/
+		int index = -1;
+		
 		if(!missingPieces.isEmpty()) {
-			while(!fileManager.getRequestBitset().get(index)) {
+			while(index == -1 || fileManager.getRequestBitset().get(index)) {
 				index = missingPieces.nextSetBit(random.nextInt(missingPieces.size()));
 			}
 		}
