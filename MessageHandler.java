@@ -85,6 +85,7 @@ public class MessageHandler implements Runnable {
 					break;
 				case 6:
 					System.out.println("Request msg received by " + neighborPeerId);
+					handleRequestMsg(ByteBuffer.wrap(inputStreamByte, 0, 4).getInt());
 					break;
 				case 7:
 					System.out.println("Piece received from " + neighborPeerId);
@@ -96,6 +97,10 @@ public class MessageHandler implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void handleRequestMsg(int int1) {
+		
 	}
 
 	private void handleNotInterstedMsg() {
@@ -112,21 +117,21 @@ public class MessageHandler implements Runnable {
 
 	private void handlePieceMsg(int index) {
 		//delete entry from requestmap
+		System.out.println("Received piece number " + index + " from " + neighborPeerId);
 		fileManager.getRequestPieceMap().remove(neighborPeerId);
 		connectionMap.get(neighborPeerId).incrementNumberOfReceivedPieces();
-		try {
-			sendHaveAll(HaveMessage.createHaveMessage(index));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		sendHaveAll(index);
 		
 		if(fileManager.getCustomBitField().hasAll())
 			checkIfEveryoneHasFile();
 	}
 
-	private void sendHaveAll(byte[] createHaveMessage) {
-		
+	private void sendHaveAll(int index) {
+		try {
+			outputStream.write(HaveMessage.createHaveMessage(index));
+		} catch (IOException e) {
+			System.out.println("Error occurred while sending have msg.");
+		}
 	}
 
 	private void handleHaveMsg(int index) {
@@ -256,6 +261,8 @@ public class MessageHandler implements Runnable {
 					//logger
 				}
 			}
+			
+			System.out.println("Stopping the unchoking cycles.");
 			unchokeCycle.setCycleStopped(true);
 			
 			for(Map.Entry<Integer, Neighbor> entry : connectionMap.entrySet()){
