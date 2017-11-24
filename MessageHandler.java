@@ -4,6 +4,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.BitSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -18,12 +19,14 @@ public class MessageHandler implements Runnable {
 	FileManager fileManager;
 	int neighborPeerId;
 	Map<Integer, Neighbor> connectionMap;
-
-	MessageHandler(Socket connectionSocket, FileManager fileManager, int peerId, Map<Integer, Neighbor> connectionMap) {
+	private List<Neighbor> interestedNeighbors;
+	
+	MessageHandler(Socket connectionSocket, FileManager fileManager, int peerId, Map<Integer, Neighbor> connectionMap, List<Neighbor> interestedNeighbors) {
 		socket = connectionSocket;
 		this.fileManager = fileManager;
 		this.neighborPeerId = peerId;
 		this.connectionMap = connectionMap;
+		this.interestedNeighbors = interestedNeighbors;
 	}
 
 	@Override
@@ -63,6 +66,7 @@ public class MessageHandler implements Runnable {
 					break;
 				case 2:
 					System.out.println("received interested msg from " + neighborPeerId);
+					handleInterestedMsg();
 					break;
 				case 3:
 					System.out.println("received not interested msg from " + neighborPeerId);
@@ -87,6 +91,11 @@ public class MessageHandler implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void handleInterestedMsg() {
+		connectionMap.get(neighborPeerId).setInterested(true);
+		interestedNeighbors.add(connectionMap.get(neighborPeerId));
 	}
 
 	private void handlePieceMsg(byte[] inputStreamByte) {

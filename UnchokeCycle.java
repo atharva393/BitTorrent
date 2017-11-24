@@ -46,6 +46,7 @@ public class UnchokeCycle {
 			OutputStream outputStream;
 			while(!isCycleStopped()) {
 				if((System.currentTimeMillis() - previousUnchokeTime) >= unchokingTimeInterval * 1000 && peer.getInterestedNeighbors().size()>0) {
+					System.out.println("Interested count : " + peer.getInterestedNeighbors().size());
 					List<Neighbor> newUnchokedNeighbors = selectNewUnchokedNeighbors();
 					List<Integer> currentlyUnchokedNeighbors = peer.getCurrentlyUnchokedNeighborIds();
 					List<Integer> toChokeList = new ArrayList<>(currentlyUnchokedNeighbors);

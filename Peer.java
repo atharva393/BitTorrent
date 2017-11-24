@@ -31,7 +31,7 @@ public class Peer {
 	}
 
 	private void startServer(PeerInfo peerInfo) {
-		Thread server = new Thread(new Server(peerInfo.id, peerInfo.port, connectionMap, fileManager, peerInfoMap));
+		Thread server = new Thread(new Server(peerInfo.id, peerInfo.port, connectionMap, fileManager, peerInfoMap, interestedNeighbors));
 		server.start();
 		//start unchokecycle
 		unchokeCycle.beginCycle();
@@ -72,7 +72,7 @@ public class Peer {
 
 			if (HandshakeMessage.getPeerID_Handshake_Message(response) == peer.getPeerInfo().id) {
 
-				Thread t = new Thread(new MessageHandler(socket, fileManager, peer.getPeerInfo().id, connectionMap));
+				Thread t = new Thread(new MessageHandler(socket, fileManager, peer.getPeerInfo().id, connectionMap, interestedNeighbors));
 				t.start();
 				if (!this.fileManager.getCustomBitField().getBitSet().isEmpty()) {
 					bitFieldMessage = BitFieldMessage

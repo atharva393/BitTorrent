@@ -1,5 +1,6 @@
 import java.net.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import messages.BitFieldMessage;
@@ -14,15 +15,17 @@ public class Server implements Runnable {
 	FileManager fileManager;
 	int myPeerId;
 	Map<Integer, PeerInfo> peerInfoMap;
-
+	private List<Neighbor> interestedNeighbors;
+	
 	public Server(int peerId, int sPort, HashMap<Integer, Neighbor> connectionMap, FileManager fileManager,
-			Map<Integer, PeerInfo> peerInfoMap) {
+			Map<Integer, PeerInfo> peerInfoMap, List<Neighbor> interestedNeighbors) {
 		try {
 			this.myPeerId = peerId;
 			this.connectionMap = connectionMap;
 			this.welcomingSocket = new ServerSocket(sPort);
 			this.fileManager = fileManager;
 			this.peerInfoMap = peerInfoMap;
+			this.interestedNeighbors = interestedNeighbors;
 		} catch (Exception e) {
 			System.out.println("error creating server");
 		}
@@ -47,7 +50,7 @@ public class Server implements Runnable {
 				System.out.println("Receive message: " + new String(msg, "US-ASCII") + " from client ");
 
 				outputStream.write(HandshakeMessage.createHandshakeMessage(myPeerId));
-				Thread t = new Thread(new MessageHandler(connectionSocket, fileManager, neighborPeerId, connectionMap));
+				Thread t = new Thread(new MessageHandler(connectionSocket, fileManager, neighborPeerId, connectionMap, interestedNeighbors));
 				t.start();
 				byte[] bitFieldMsg;
 				
