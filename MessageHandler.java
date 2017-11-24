@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import messages.HaveMessage;
 import messages.InterestedMessage;
 import messages.NotInterestedMessage;
 import messages.RequestMessage;
@@ -20,13 +21,16 @@ public class MessageHandler implements Runnable {
 	int neighborPeerId;
 	Map<Integer, Neighbor> connectionMap;
 	private List<Neighbor> interestedNeighbors;
+	private UnchokeCycle unchokeCycle;
 	
-	MessageHandler(Socket connectionSocket, FileManager fileManager, int peerId, Map<Integer, Neighbor> connectionMap, List<Neighbor> interestedNeighbors) {
+	MessageHandler(Socket connectionSocket, FileManager fileManager, int peerId, Map<Integer, Neighbor> connectionMap,
+			List<Neighbor> interestedNeighbors, UnchokeCycle unchokeCycle) {
 		socket = connectionSocket;
 		this.fileManager = fileManager;
 		this.neighborPeerId = peerId;
 		this.connectionMap = connectionMap;
 		this.interestedNeighbors = interestedNeighbors;
+		this.unchokeCycle = unchokeCycle;
 	}
 
 	@Override
@@ -70,6 +74,7 @@ public class MessageHandler implements Runnable {
 					break;
 				case 3:
 					System.out.println("received not interested msg from " + neighborPeerId);
+					handleNotInterstedMsg();
 					break;
 				case 4:
 					handleHaveMsg(ByteBuffer.wrap(inputStreamByte, 0, 4).getInt());
@@ -83,7 +88,7 @@ public class MessageHandler implements Runnable {
 					break;
 				case 7:
 					System.out.println("Piece received from " + neighborPeerId);
-					handlePieceMsg(inputStreamByte);
+					handlePieceMsg(ByteBuffer.wrap(inputStreamByte, 0, 4).getInt());
 					break;
 				}
 			}
@@ -93,18 +98,39 @@ public class MessageHandler implements Runnable {
 		}
 	}
 
+	private void handleNotInterstedMsg() {
+		connectionMap.get(neighborPeerId).setInterested(false);
+		if(interestedNeighbors.contains(neighborPeerId)){
+			interestedNeighbors.remove(new Integer(neighborPeerId));
+		}
+	}
+
 	private void handleInterestedMsg() {
 		connectionMap.get(neighborPeerId).setInterested(true);
 		interestedNeighbors.add(connectionMap.get(neighborPeerId));
 	}
 
-	private void handlePieceMsg(byte[] inputStreamByte) {
-		//request map se delete krna hai
+	private void handlePieceMsg(int index) {
+		//delete entry from requestmap
+		fileManager.getRequestPieceMap().remove(neighborPeerId);
+		connectionMap.get(neighborPeerId).incrementNumberOfReceivedPieces();
+		try {
+			sendHaveAll(HaveMessage.createHaveMessage(index));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		if(fileManager.getCustomBitField().hasAll())
+			checkIfEveryoneHasFile();
+	}
+
+	private void sendHaveAll(byte[] createHaveMessage) {
 		
 	}
 
 	private void handleHaveMsg(int index) {
-		connectionMap.get(neighborPeerId).getNeighborBitField().getBitSet().set(index);
+		connectionMap.get(neighborPeerId).getNeighborBitField().set(index);
 		
 		if(!fileManager.getCustomBitField().getBitSet().get(index)){
 			byte[] interestedMessage;
@@ -117,6 +143,10 @@ public class MessageHandler implements Runnable {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		} 
+		
+		if(connectionMap.get(neighborPeerId).getNeighborBitField().hasAll()){
+			checkIfEveryoneHasFile();
 		}
 	}
 
@@ -217,5 +247,24 @@ public class MessageHandler implements Runnable {
 
 	}
 	
-	
+	public void checkIfEveryoneHasFile(){
+		if(fileManager.getCustomBitField().hasAll()){
+			for(Map.Entry<Integer, Neighbor> entry : connectionMap.entrySet()){
+				if(!entry.getValue().getNeighborBitField().hasAll()){
+					return;
+				} else{
+					//logger
+				}
+			}
+			unchokeCycle.setCycleStopped(true);
+			
+			for(Map.Entry<Integer, Neighbor> entry : connectionMap.entrySet()){
+				try {
+					entry.getValue().getRequestSocket().close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 }

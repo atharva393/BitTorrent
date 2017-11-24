@@ -16,9 +16,10 @@ public class Server implements Runnable {
 	int myPeerId;
 	Map<Integer, PeerInfo> peerInfoMap;
 	private List<Neighbor> interestedNeighbors;
+	private UnchokeCycle unchokeCycle;
 	
 	public Server(int peerId, int sPort, HashMap<Integer, Neighbor> connectionMap, FileManager fileManager,
-			Map<Integer, PeerInfo> peerInfoMap, List<Neighbor> interestedNeighbors) {
+			Map<Integer, PeerInfo> peerInfoMap, List<Neighbor> interestedNeighbors, UnchokeCycle unchokeCycle) {
 		try {
 			this.myPeerId = peerId;
 			this.connectionMap = connectionMap;
@@ -26,6 +27,7 @@ public class Server implements Runnable {
 			this.fileManager = fileManager;
 			this.peerInfoMap = peerInfoMap;
 			this.interestedNeighbors = interestedNeighbors;
+			this.unchokeCycle = unchokeCycle;
 		} catch (Exception e) {
 			System.out.println("error creating server");
 		}
@@ -50,7 +52,7 @@ public class Server implements Runnable {
 				System.out.println("Receive message: " + new String(msg, "US-ASCII") + " from client ");
 
 				outputStream.write(HandshakeMessage.createHandshakeMessage(myPeerId));
-				Thread t = new Thread(new MessageHandler(connectionSocket, fileManager, neighborPeerId, connectionMap, interestedNeighbors));
+				Thread t = new Thread(new MessageHandler(connectionSocket, fileManager, neighborPeerId, connectionMap, interestedNeighbors, unchokeCycle));
 				t.start();
 				byte[] bitFieldMsg;
 				

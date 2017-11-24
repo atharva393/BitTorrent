@@ -52,13 +52,10 @@ public class PeerProcess {
 					break;
 				}
 			}
-
 			sc.close();
-
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("error when reading from peer file");
 		}
 	}
-
 }

@@ -102,6 +102,9 @@ public class Neighbor {
 		this.numberOfReceivedPieces = numberOfReceivedPieces;
 	}
 
+	public void incrementNumberOfReceivedPieces(){
+		this.numberOfReceivedPieces += 1;	
+	}
 	public long getUnchokedAt() {
 		return unchokedAt;
 	}
