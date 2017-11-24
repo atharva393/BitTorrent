@@ -22,7 +22,7 @@ public class Peer {
 	Peer(PeerInfo peerInfo, ArrayList<PeerInfo> peersToConnect, Map<Integer, PeerInfo> peerInfoMap) {
 		this.peerInfo = peerInfo;
 		connectionMap = new HashMap<>();
-		fileManager = new FileManager(peerInfo.hasFile);
+		fileManager = new FileManager(peerInfo);
 		this.peerInfoMap = peerInfoMap;
 		this.interestedNeighbors = new ArrayList<Neighbor>();
 		this.unchokeCycle = new UnchokeCycle(this);

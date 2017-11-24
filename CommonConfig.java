@@ -28,7 +28,7 @@ public class CommonConfig {
 		return numberOfPreferredNeighbors;
 	}
 
-	public void setNumberOfPreferredNeighbors(int numberOfPreferredNeighbors) {
+	private void setNumberOfPreferredNeighbors(int numberOfPreferredNeighbors) {
 		this.numberOfPreferredNeighbors = numberOfPreferredNeighbors;
 	}
 
@@ -36,7 +36,7 @@ public class CommonConfig {
 		return unchokingInterval;
 	}
 
-	public void setUnchokingInterval(int unchokingInterval) {
+	private void setUnchokingInterval(int unchokingInterval) {
 		this.unchokingInterval = unchokingInterval;
 	}
 
@@ -44,7 +44,7 @@ public class CommonConfig {
 		return optimisticUnchokingInterval;
 	}
 
-	public void setOptimisticUnchokingInterval(int optimisticUnchokingInterval) {
+	private void setOptimisticUnchokingInterval(int optimisticUnchokingInterval) {
 		this.optimisticUnchokingInterval = optimisticUnchokingInterval;
 	}
 
@@ -52,7 +52,7 @@ public class CommonConfig {
 		return fileSize;
 	}
 
-	public void setFileSize(int fileSize) {
+	private void setFileSize(int fileSize) {
 		this.fileSize = fileSize;
 	}
 
@@ -60,7 +60,7 @@ public class CommonConfig {
 		return pieceSize;
 	}
 
-	public void setPieceSize(int pieceSize) {
+	private void setPieceSize(int pieceSize) {
 		this.pieceSize = pieceSize;
 	}
 
@@ -68,7 +68,7 @@ public class CommonConfig {
 		return fileName;
 	}
 
-	public void setFileName(String fileName) {
+	private void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
 

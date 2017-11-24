@@ -1,3 +1,4 @@
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,6 +12,7 @@ import java.util.Random;
 import messages.HaveMessage;
 import messages.InterestedMessage;
 import messages.NotInterestedMessage;
+import messages.PieceMessage;
 import messages.RequestMessage;
 
 public class MessageHandler implements Runnable {
@@ -85,11 +87,11 @@ public class MessageHandler implements Runnable {
 					break;
 				case 6:
 					System.out.println("Request msg received by " + neighborPeerId);
-					handleRequestMsg(ByteBuffer.wrap(inputStreamByte, 0, 4).getInt());
+					handleRequestPieceMsg(ByteBuffer.wrap(inputStreamByte, 0, 4).getInt());
 					break;
 				case 7:
 					System.out.println("Piece received from " + neighborPeerId);
-					handlePieceMsg(ByteBuffer.wrap(inputStreamByte, 0, 4).getInt());
+					handlePieceMsg(inputStreamByte);
 					break;
 				}
 			}
@@ -99,14 +101,24 @@ public class MessageHandler implements Runnable {
 		}
 	}
 
-	private void handleRequestMsg(int int1) {
+	private void handleRequestPieceMsg(int index) {
+		if(!fileManager.getCustomBitField().getBitSet().get(index))
+			return;
 		
+		try {
+			byte[] piece = fileManager.readPieceFromFile(index);
+			outputStream.write(PieceMessage.createPieceMessage(index, piece));
+		} catch(FileNotFoundException e){
+			System.out.println("File not found");
+		} catch (IOException e) {
+			System.out.println("Something went wrong while retrieving the piece.");
+		}
 	}
 
 	private void handleNotInterstedMsg() {
 		connectionMap.get(neighborPeerId).setInterested(false);
-		if(interestedNeighbors.contains(neighborPeerId)){
-			interestedNeighbors.remove(new Integer(neighborPeerId));
+		if(interestedNeighbors.contains(connectionMap.get(neighborPeerId))){
+			interestedNeighbors.remove(connectionMap.get(neighborPeerId));
 		}
 	}
 
@@ -115,18 +127,33 @@ public class MessageHandler implements Runnable {
 		interestedNeighbors.add(connectionMap.get(neighborPeerId));
 	}
 
-	private void handlePieceMsg(int index) {
+	private void handlePieceMsg(byte[] pieceInfo) {
 		//delete entry from requestmap
+		int index = ByteBuffer.wrap(pieceInfo, 0, 4).getInt();
 		System.out.println("Received piece number " + index + " from " + neighborPeerId);
 		fileManager.getRequestPieceMap().remove(neighborPeerId);
 		connectionMap.get(neighborPeerId).incrementNumberOfReceivedPieces();
-		sendHaveAll(index);
+		fileManager.writePieceToFile(index, pieceInfo);
+		sendHaveMsgToAll(index);
+				
+		for(Map.Entry<Integer, Neighbor> neighbor : connectionMap.entrySet()) {
+			if(neighbor.getValue().isAmInterested() && 
+					hasMissingPieces(neighbor.getValue().getNeighborBitField().getBitSet()).isEmpty()) {
+				neighbor.getValue().setAmInterested(false);
+				try {
+					outputStream.write(NotInterestedMessage.createNotInterestedMessage());
+				} catch (IOException e) {
+					System.out.println("Error occurred while sending not interested msg from handlePiecemsg method");
+					e.printStackTrace();
+				}
+			}
+		}
 		
 		if(fileManager.getCustomBitField().hasAll())
 			checkIfEveryoneHasFile();
 	}
 
-	private void sendHaveAll(int index) {
+	private void sendHaveMsgToAll(int index) {
 		try {
 			outputStream.write(HaveMessage.createHaveMessage(index));
 		} catch (IOException e) {

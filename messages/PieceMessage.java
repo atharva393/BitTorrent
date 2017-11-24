@@ -5,10 +5,10 @@ import java.io.IOException;
 
 public class PieceMessage {
 
-	final int messageType = 7;
-	final int messageTypeLen = 1;
+	final static int messageType = 7;
+	final static int messageTypeLen = 1;
 
-	byte[] create_Piece_Message(int pieceIndex, byte[] content) throws IOException {
+	public static byte[] createPieceMessage(int pieceIndex, byte[] content) throws IOException {
 		ByteArrayOutputStream msgStream = new ByteArrayOutputStream();
 		byte[] pieceIndexField = Helper.getBytesOfGivenSizeAndMessage(pieceIndex, 4);
 		int messageTotalLen = pieceIndexField.length + content.length + messageTypeLen;
