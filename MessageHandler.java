@@ -58,7 +58,7 @@ public class MessageHandler implements Runnable {
 				switch (messageType) {
 				case 0:
 					System.out.println("choking msg received from " + neighborPeerId);
-					handleChokeMsg(inputStreamByte);
+					handleChokeMsg();
 					break;
 				case 1:
 					System.out.println("unchoked msg received from " + neighborPeerId);
@@ -123,6 +123,8 @@ public class MessageHandler implements Runnable {
 	private void handleUnChokeMsg() {
 		connectionMap.get(neighborPeerId).setChokingMe(false);
 		
+		connectionMap.get(neighborPeerId).setUnchokedAt(System.currentTimeMillis());
+		
 		if(connectionMap.get(neighborPeerId).isAmInterested()) {
 			sendPieceRequest();
 		}
@@ -152,12 +154,7 @@ public class MessageHandler implements Runnable {
 	}
 	private int getRandomPieceIndex(BitSet missingPieces) {
 		Random random = new Random();
-		/*int randomNumber = random.nextInt(missingPieces.size());
-		System.out.println(randomNumber);
-		System.out.println(missingPieces);
-		int index = missingPieces.nextSetBit(randomNumber);
-		if(index==-1)
-			index = missingPieces.previousSetBit(randomNumber);*/
+		
 		int index = -1;
 		
 		if(!missingPieces.isEmpty()) {
@@ -190,8 +187,20 @@ public class MessageHandler implements Runnable {
 		}
 	}
 
-	private void handleChokeMsg(byte[] inputStreamByte) {
-		//request map se delete krna hai
+	private void handleChokeMsg() {
+		
+		connectionMap.get(neighborPeerId).setChokingMe(true);
+		
+		Neighbor neighbor = connectionMap.get(neighborPeerId);
+		neighbor.setDownloadRate(neighbor.getNumberOfReceivedPieces() * 1.0 / (System.currentTimeMillis() - neighbor.getUnchokedAt()));
+		neighbor.setNumberOfReceivedPieces(0);
+		
+		if(fileManager.getRequestPieceMap().containsKey(neighborPeerId)) {
+			int indexToClear = fileManager.getRequestPieceMap().get(neighborPeerId);
+			fileManager.getRequestBitset().clear(indexToClear);
+			fileManager.getRequestPieceMap().remove(neighborPeerId);
+		}
+		
 	}
 
 	private BitSet hasMissingPieces(BitSet otherBitSet) {
