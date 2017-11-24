@@ -24,8 +24,9 @@ public class Peer {
 		connectionMap = new HashMap<>();
 		fileManager = new FileManager(peerInfo.hasFile);
 		this.peerInfoMap = peerInfoMap;
-		this.setInterestedNeighbors(new ArrayList<Neighbor>());
+		this.interestedNeighbors = new ArrayList<Neighbor>();
 		this.unchokeCycle = new UnchokeCycle(this);
+		this.currentlyUnchokedNeighborIds = new ArrayList<Integer>();
 		startServer(peerInfo);
 		createConnections(peersToConnect);
 	}

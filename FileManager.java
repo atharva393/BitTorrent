@@ -5,8 +5,8 @@ import java.util.Map;
 public class FileManager {
 
 	private CustomBitField customBitField;
-	private BitSet requestBitset;
-	private Map<Integer, Integer> requestPieceMap;
+	private BitSet requestBitset = new BitSet();
+	private Map<Integer, Integer> requestPieceMap = new HashMap<>();
 
 	public CustomBitField getCustomBitField() {
 		return customBitField;
@@ -15,7 +15,6 @@ public class FileManager {
 	FileManager(boolean hasFile){
 		
 		CommonConfig commonConfig = CommonConfig.getCommonProperties();
-		this.setRequestPieceMap(new HashMap<>());
 		customBitField = new CustomBitField(commonConfig.getFileSize()/commonConfig.getPieceSize());
 		
 		if(hasFile) {

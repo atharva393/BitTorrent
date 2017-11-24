@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 import messages.ChokeMessage;
+import messages.UnchokeMessage;
 
 public class UnchokeCycle {
 	private int unchokingTimeInterval;
@@ -58,7 +59,7 @@ public class UnchokeCycle {
 							//send unchoked msg
 							try {
 								outputStream = peer.getConnectionMap().get(n.getPeerInfo().id).getRequestSocket().getOutputStream();
-								outputStream.write(ChokeMessage.createChokeMessage());
+								outputStream.write(UnchokeMessage.createUnchokeMessage());
 							} catch (IOException e) {
 								e.printStackTrace();
 							}

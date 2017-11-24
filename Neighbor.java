@@ -3,7 +3,6 @@ import java.net.Socket;
 
 public class Neighbor {
 	private PeerInfo peerInfo;
-	private int noPrevPiecesRcvd;
 	private Socket requestSocket;
 	private CustomBitField neighborBitField;
 	private boolean isChokingMe;
@@ -77,15 +76,6 @@ public class Neighbor {
 
 	public void setAmInterested(boolean amInterested) {
 		this.amInterested = amInterested;
-	}
-
-
-	public int getNoPrevPiecesRcvd() {
-		return noPrevPiecesRcvd;
-	}
-
-	public void setNoPrevPiecesRcvd(int noPrevPiecesRcvd) {
-		this.noPrevPiecesRcvd = noPrevPiecesRcvd;
 	}
 
 	public Socket getRequestSocket() {

@@ -122,6 +122,7 @@ public class MessageHandler implements Runnable {
 
 	private void handleUnChokeMsg() {
 		connectionMap.get(neighborPeerId).setChokingMe(false);
+		
 		if(connectionMap.get(neighborPeerId).isAmInterested()) {
 			sendPieceRequest();
 		}
