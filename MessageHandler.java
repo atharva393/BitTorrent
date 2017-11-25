@@ -28,7 +28,7 @@ public class MessageHandler implements Runnable {
 	
 	MessageHandler(Socket connectionSocket, FileManager fileManager, int peerId, Map<Integer, Neighbor> connectionMap,
 			List<Neighbor> interestedNeighbors, UnchokeCycle unchokeCycle) {
-		socket = connectionSocket;
+		this.socket = connectionSocket;
 		this.fileManager = fileManager;
 		this.neighborPeerId = peerId;
 		this.connectionMap = connectionMap;
@@ -108,7 +108,7 @@ public class MessageHandler implements Runnable {
 		
 		try {
 			byte[] piece = fileManager.readPieceFromFile(index);
-			System.out.println("Piece content in msg handler : " + new String(piece));
+			//System.out.println("Piece content in msg handler : " + new String(piece));
 			outputStream.write(PieceMessage.createPieceMessage(index, piece));
 		} catch(FileNotFoundException e){
 			System.out.println("File not found");
@@ -159,10 +159,12 @@ public class MessageHandler implements Runnable {
 	}
 
 	private void sendHaveMsgToAll(int index) {
-		try {
-			outputStream.write(HaveMessage.createHaveMessage(index));
-		} catch (IOException e) {
-			System.out.println("Error occurred while sending have msg.");
+		for(Map.Entry<Integer, Neighbor> entry : connectionMap.entrySet()){
+			try {
+				entry.getValue().getRequestSocket().getOutputStream().write(HaveMessage.createHaveMessage(index));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -180,7 +182,7 @@ public class MessageHandler implements Runnable {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		} 
+		}
 		System.out.println("Bitset of " + neighborPeerId + connectionMap.get(neighborPeerId).getNeighborBitField().getBitSet());
 		if(connectionMap.get(neighborPeerId).getNeighborBitField().hasAll()){
 			checkIfEveryoneHasFile();
@@ -296,14 +298,21 @@ public class MessageHandler implements Runnable {
 			
 			System.out.println("Stopping the unchoking cycles.");
 			unchokeCycle.setCycleStopped(true);
-			
+			try {
+				socket.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 			for(Map.Entry<Integer, Neighbor> entry : connectionMap.entrySet()){
 				try {
+					System.err.println("Closing the socket for " + entry.getKey());
 					entry.getValue().getRequestSocket().close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
+			
+			//shut down the server only when connection map has all the peer ids in it.
 		}
 	}
 }

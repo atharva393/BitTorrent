@@ -78,7 +78,7 @@ public class FileManager {
 		fileInputStream.skip(index * pieceSize);
 		byte[] piece = new byte[Math.min(fileSize - index * pieceSize, pieceSize)];
 		fileInputStream.read(piece);
-		System.out.println("Read from file:" + new String(piece));
+		//System.out.println("Read from file:" + new String(piece));
 		fileInputStream.close();
 		return piece;
 

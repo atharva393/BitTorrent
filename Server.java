@@ -52,6 +52,12 @@ public class Server implements Runnable {
 				System.out.println("Receive message: " + new String(msg, "US-ASCII") + " from client ");
 
 				outputStream.write(HandshakeMessage.createHandshakeMessage(myPeerId));
+				
+				if(unchokeCycle.isCycleStopped()){
+					unchokeCycle.setCycleStopped(false);
+					unchokeCycle.beginCycle();
+				}
+				
 				Thread t = new Thread(new MessageHandler(connectionSocket, fileManager, neighborPeerId, connectionMap, interestedNeighbors, unchokeCycle));
 				t.start();
 				byte[] bitFieldMsg;
