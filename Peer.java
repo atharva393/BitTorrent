@@ -73,7 +73,7 @@ public class Peer {
 
 			if (HandshakeMessage.getPeerID_Handshake_Message(response) == peer.getPeerInfo().id) {
 
-				Thread t = new Thread(new MessageHandler(socket, fileManager, peer.getPeerInfo().id, connectionMap, interestedNeighbors, unchokeCycle));
+				Thread t = new Thread(new MessageHandler(socket, fileManager, peer.getPeerInfo().id, connectionMap, interestedNeighbors, unchokeCycle, peerInfoMap));
 				t.start();
 				if (!this.fileManager.getCustomBitField().getBitSet().isEmpty()) {
 					bitFieldMessage = BitFieldMessage

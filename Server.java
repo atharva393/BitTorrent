@@ -58,7 +58,7 @@ public class Server implements Runnable {
 					unchokeCycle.beginCycle();
 				}
 				
-				Thread t = new Thread(new MessageHandler(connectionSocket, fileManager, neighborPeerId, connectionMap, interestedNeighbors, unchokeCycle));
+				Thread t = new Thread(new MessageHandler(connectionSocket, fileManager, neighborPeerId, connectionMap, interestedNeighbors, unchokeCycle, peerInfoMap));
 				t.start();
 				byte[] bitFieldMsg;
 				

@@ -25,15 +25,17 @@ public class MessageHandler implements Runnable {
 	Map<Integer, Neighbor> connectionMap;
 	private List<Neighbor> interestedNeighbors;
 	private UnchokeCycle unchokeCycle;
+	private Map<Integer, PeerInfo> peerInfoMap;
 	
 	MessageHandler(Socket connectionSocket, FileManager fileManager, int peerId, Map<Integer, Neighbor> connectionMap,
-			List<Neighbor> interestedNeighbors, UnchokeCycle unchokeCycle) {
+			List<Neighbor> interestedNeighbors, UnchokeCycle unchokeCycle, Map<Integer, PeerInfo> peerInfoMap) {
 		this.socket = connectionSocket;
 		this.fileManager = fileManager;
 		this.neighborPeerId = peerId;
 		this.connectionMap = connectionMap;
 		this.interestedNeighbors = interestedNeighbors;
 		this.unchokeCycle = unchokeCycle;
+		this.peerInfoMap = peerInfoMap;
 	}
 
 	@Override
@@ -303,6 +305,7 @@ public class MessageHandler implements Runnable {
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
+			
 			for(Map.Entry<Integer, Neighbor> entry : connectionMap.entrySet()){
 				try {
 					System.err.println("Closing the socket for " + entry.getKey());
@@ -313,6 +316,8 @@ public class MessageHandler implements Runnable {
 			}
 			
 			//shut down the server only when connection map has all the peer ids in it.
+			if(connectionMap.size() == peerInfoMap.size())
+				System.exit(0);
 		}
 	}
 }
