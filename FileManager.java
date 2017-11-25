@@ -3,6 +3,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -62,7 +63,7 @@ public class FileManager {
 		try {
 			randomAccessFile = new RandomAccessFile(file, "rw");
 			randomAccessFile.seek(index * pieceSize);
-			randomAccessFile.write(pieceInfo);
+			randomAccessFile.write(new String(pieceInfo, StandardCharsets.UTF_8).getBytes());
 			randomAccessFile.close();
 			getCustomBitField().set(index);
 		} catch (FileNotFoundException e) {
@@ -75,8 +76,9 @@ public class FileManager {
 	public byte[] readPieceFromFile(int index) throws FileNotFoundException, IOException{
 		FileInputStream fileInputStream = new FileInputStream(file);
 		fileInputStream.skip(index * pieceSize);
-		byte[] piece = new byte[Math.min(fileSize - index * pieceSize, pieceSize )];
+		byte[] piece = new byte[Math.min(fileSize - index * pieceSize, pieceSize)];
 		fileInputStream.read(piece);
+		System.out.println("Read from file:" + new String(piece));
 		fileInputStream.close();
 		return piece;
 

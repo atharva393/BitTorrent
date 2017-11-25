@@ -73,6 +73,7 @@ public class UnchokeCycle {
 					for(int i: toChokeList) {
 						//send choked msg
 						try {
+							System.out.println("sending choke msg to " + i);
 							outputStream = peer.getConnectionMap().get(i).getRequestSocket().getOutputStream();
 							outputStream.write(ChokeMessage.createChokeMessage());
 						} catch (IOException e) {

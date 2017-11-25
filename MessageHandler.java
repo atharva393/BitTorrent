@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
@@ -107,6 +108,7 @@ public class MessageHandler implements Runnable {
 		
 		try {
 			byte[] piece = fileManager.readPieceFromFile(index);
+			System.out.println("Piece content in msg handler : " + new String(piece));
 			outputStream.write(PieceMessage.createPieceMessage(index, piece));
 		} catch(FileNotFoundException e){
 			System.out.println("File not found");
@@ -133,7 +135,7 @@ public class MessageHandler implements Runnable {
 		System.out.println("Received piece number " + index + " from " + neighborPeerId);
 		fileManager.getRequestPieceMap().remove(neighborPeerId);
 		connectionMap.get(neighborPeerId).incrementNumberOfReceivedPieces();
-		fileManager.writePieceToFile(index, pieceInfo);
+		fileManager.writePieceToFile(index, Arrays.copyOfRange(pieceInfo, 4, pieceInfo.length));
 		sendHaveMsgToAll(index);
 				
 		for(Map.Entry<Integer, Neighbor> neighbor : connectionMap.entrySet()) {
@@ -149,8 +151,11 @@ public class MessageHandler implements Runnable {
 			}
 		}
 		
-		if(fileManager.getCustomBitField().hasAll())
+		if(fileManager.getCustomBitField().hasAll()){
 			checkIfEveryoneHasFile();
+		} else{
+			sendPieceRequest();
+		}
 	}
 
 	private void sendHaveMsgToAll(int index) {
@@ -176,7 +181,7 @@ public class MessageHandler implements Runnable {
 				e.printStackTrace();
 			}
 		} 
-		
+		System.out.println("Bitset of " + neighborPeerId + connectionMap.get(neighborPeerId).getNeighborBitField().getBitSet());
 		if(connectionMap.get(neighborPeerId).getNeighborBitField().hasAll()){
 			checkIfEveryoneHasFile();
 		}

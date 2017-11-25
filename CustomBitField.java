@@ -6,7 +6,7 @@ import java.util.BitSet;
  */
 public class CustomBitField {
 	private BitSet bitSet = new BitSet();
-	private int numberOfPieces = 0;
+	private int numberOfPieces = (int) Math.ceil(CommonConfig.getCommonProperties().getFileSize() / CommonConfig.getCommonProperties().getPieceSize());
 	
 	public BitSet getBitSet() {
 		return bitSet;
@@ -31,13 +31,13 @@ public class CustomBitField {
 	}
 
 	public synchronized void setAll() {
-		for (int index = 0; index <= numberOfPieces; index++) {
+		for (int index = 0; index < numberOfPieces; index++) {
 			bitSet.set(index);
 		}
 	}
 	
 	public synchronized boolean hasAll() {
-		for (int index = 0; index <= numberOfPieces; index++) {
+		for (int index = 0; index < numberOfPieces; index++) {
 			if (!bitSet.get(index))
 				return false;
 		}

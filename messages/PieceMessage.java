@@ -17,6 +17,7 @@ public class PieceMessage {
 		msgStream.write(messageType);
 		msgStream.write(pieceIndexField);
 		msgStream.write(content);
+		System.out.println("Content in piece msg:" + new String(content));
 		return msgStream.toByteArray();
 	}
 }
