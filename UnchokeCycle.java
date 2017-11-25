@@ -138,16 +138,22 @@ public class UnchokeCycle {
 
 					Neighbor neighborToUnchoke = getChokedNeighborRandomly(peer.getInterestedNeighbors());
 
-					try {
-						outputstream = peer.getConnectionMap().get(neighborToUnchoke.getPeerInfo().id).getRequestSocket().getOutputStream();
+					if (neighborToUnchoke != null) {
 
-						outputstream.write(UnchokeMessage.createUnchokeMessage());
-						
-					} catch (IOException e) {
-						e.printStackTrace();
+						try {
+							outputstream = peer.getConnectionMap().get(neighborToUnchoke.getPeerInfo().id)
+									.getRequestSocket().getOutputStream();
+
+							outputstream.write(UnchokeMessage.createUnchokeMessage());
+
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+
+						previousOptimisticUnchokeTime = System.currentTimeMillis();
+
 					}
-
-					previousOptimisticUnchokeTime = System.currentTimeMillis();
+					
 				}
 			}
 		}
@@ -156,12 +162,15 @@ public class UnchokeCycle {
 
 			List<Neighbor> interestedChokedNeighbors = new ArrayList<>(interestedNeighbors);
 
-			for (Neighbor neighbor : interestedChokedNeighbors) {
+			for (Neighbor neighbor : interestedNeighbors) {
 				if (!neighbor.isChokedbyMe()) {
 					interestedChokedNeighbors.remove(neighbor);
 				}
 			}
-
+			
+			if(interestedChokedNeighbors.size()==0)
+				return null;
+			
 			return interestedChokedNeighbors.get(new Random().nextInt(interestedChokedNeighbors.size()));
 		}
 	}

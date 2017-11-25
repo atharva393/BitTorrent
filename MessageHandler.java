@@ -99,8 +99,8 @@ public class MessageHandler implements Runnable {
 				}
 			}
 
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			return;
 		}
 	}
 
@@ -308,15 +308,14 @@ public class MessageHandler implements Runnable {
 			
 			for(Map.Entry<Integer, Neighbor> entry : connectionMap.entrySet()){
 				try {
-					System.err.println("Closing the socket for " + entry.getKey());
+					System.out.println("Closing the socket for " + entry.getKey());
 					entry.getValue().getRequestSocket().close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
 			
-			//shut down the server only when connection map has all the peer ids in it.
-			if(connectionMap.size() == peerInfoMap.size())
+			if(connectionMap.size() == peerInfoMap.size()-1)
 				System.exit(0);
 		}
 	}
