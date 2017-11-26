@@ -14,48 +14,19 @@ import java.util.Date;
 
 public class CustomLogger {
 	
-	public CustomLogger() {
-		
-	}
+	private File logFile;
 	
-	public void createLogFile(int peerId){
-        
-        File logFile = new File("peer_" + peerId + "/log_peer_" + peerId + ".log");
-        
-        if(!logFile.exists()) {
-        	
-        	try {
-				logFile.createNewFile();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				System.out.println("Error while creating log file.");
-				e.printStackTrace();
-			}
-        } 
-        	
-        FileWriter fw;
-		try {
-			fw = new FileWriter(logFile.getAbsoluteFile(),true);
-			BufferedWriter bw = new BufferedWriter(fw);
-			bw.write("Log File for Peer "+ peerId +".");
-			bw.newLine();
-			bw.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public CustomLogger(int peerId) {
+		
+		this.logFile = new File("log_peer_" + peerId + ".log");
+		
 	}
 	
 	public void changeInPreferredNeighbors(int peerId, String neighbors){
-		String fileName = "peer_" + peerId+"/log_peer_"+peerId+".log";
-		
-		if (!new File(fileName).exists()) {
-			createLogFile(peerId);
-        }
 		
 		 try
          {
-             FileWriter fw = new FileWriter(fileName,true);
+             FileWriter fw = new FileWriter(logFile,true);
              BufferedWriter bw = new BufferedWriter(fw);
              String log = getFormattedDateTime()+": Peer " + peerId + " has the Preferred neighbours " + neighbors+".";
              bw.write(log);
@@ -79,15 +50,10 @@ public class CustomLogger {
 	}
 	
 	public void optimUnchokedNeighbor(int peerId, int optimUnchokedNeighbor) {
-		String fileName = "peer_" + peerId+"/log_peer_"+peerId+".log";
-		
-		if (!new File(fileName).exists()) {
-			createLogFile(peerId);
-        }
 		
 		 try
          {
-             FileWriter fileWriter = new FileWriter(fileName,true);
+             FileWriter fileWriter = new FileWriter(logFile,true);
              BufferedWriter bw = new BufferedWriter(fileWriter);
              String log = getFormattedDateTime()+": Peer " + peerId + " has the optimistically unchoked neighbor " + optimUnchokedNeighbor + ".";
              bw.write(log);
@@ -101,15 +67,10 @@ public class CustomLogger {
 	}
 	
 	public void unchoke(int peerId, int unchokedNeighbor) {
-		String fileName = "peer_" + peerId +"/log_peer_"+ peerId + ".log";
-		
-		if (!new File(fileName).exists()) {
-			createLogFile(peerId);
-        }
 		
 		 try
          {
-             FileWriter fileWriter = new FileWriter(fileName,true);
+             FileWriter fileWriter = new FileWriter(logFile,true);
              BufferedWriter bw = new BufferedWriter(fileWriter);
              String log = getFormattedDateTime()+": Peer " + unchokedNeighbor + " is unchoked by " + peerId + ".";
              bw.write(log);
@@ -123,15 +84,10 @@ public class CustomLogger {
 	}
 	
 	public void choke(int peerId, int chokedNeighbor) {
-		String fileName = "peer_" + peerId +"/log_peer_"+ peerId + ".log";
-		
-		if (!new File(fileName).exists()) {
-			createLogFile(peerId);
-        }
 		
 		 try
          {
-             FileWriter fileWriter = new FileWriter(fileName,true);
+             FileWriter fileWriter = new FileWriter(logFile,true);
              BufferedWriter bw = new BufferedWriter(fileWriter);
              String str = getFormattedDateTime()+": Peer " + chokedNeighbor + " is choked by " + peerId + ".";
              bw.write(str);
@@ -145,15 +101,10 @@ public class CustomLogger {
 	}
 	
 	public void receivedHave(int peerId, int senderPeer, int pieceIndex) {
-		String fileName = "peer_" + peerId +"/log_peer_"+ peerId + ".log";
-		
-		if (!new File(fileName).exists()) {
-			createLogFile(peerId);
-        }
 		
 		 try
          {
-             FileWriter fw = new FileWriter(fileName,true);
+             FileWriter fw = new FileWriter(logFile,true);
              BufferedWriter bw = new BufferedWriter(fw);
              String str = getFormattedDateTime()+": Peer " + peerId + " received the \'have\' message from " 
             		 + senderPeer + "for the piece " + pieceIndex + ".";
@@ -169,15 +120,10 @@ public class CustomLogger {
 	}
 	
 	public void receivedInterested(int peerId, int senderPeer) {
-		String fileName = "peer_" + peerId +"/log_peer_"+ peerId + ".log";
-		
-		if (!new File(fileName).exists()) {
-			createLogFile(peerId);
-        }
 		
 		 try
          {
-             FileWriter fw = new FileWriter(fileName,true);
+             FileWriter fw = new FileWriter(logFile,true);
              BufferedWriter bw = new BufferedWriter(fw);
              String str = getFormattedDateTime()+": Peer " + peerId + " received the \'interested\' message from "+ senderPeer +  ".";
              
@@ -192,15 +138,10 @@ public class CustomLogger {
 	}
 	
 	public void receivedNotInterested(int peerId, int senderPeer) {
-		String fileName = "peer_" + peerId +"/log_peer_"+ peerId + ".log";
-		
-		if (!new File(fileName).exists()) {
-			createLogFile(peerId);
-        }
 		
 		 try
          {
-             FileWriter fw = new FileWriter(fileName,true);
+             FileWriter fw = new FileWriter(logFile,true);
              BufferedWriter bw = new BufferedWriter(fw);
              String str = getFormattedDateTime()+": Peer " + peerId + " received the \'not interested\' message from "+ senderPeer +  ".";
              
@@ -215,15 +156,10 @@ public class CustomLogger {
 	}
 	
 	public void downloadedPiece(int peerId, int pieceIndex, int senderPeer, int currentPieceNumber) {
-		String fileName = "peer_" + peerId +"/log_peer_"+ peerId + ".log";
-		
-		if (!new File(fileName).exists()) {
-			createLogFile(peerId);
-        }
 		
 		 try
          {
-             FileWriter fw = new FileWriter(fileName,true);
+             FileWriter fw = new FileWriter(logFile,true);
              BufferedWriter bw = new BufferedWriter(fw);
              String str = getFormattedDateTime()+": Peer " + peerId + " has downloaded the piece " + pieceIndex + " from " + senderPeer +  "."
             		 + "Now the number of pieces it has is " + currentPieceNumber + ".";
@@ -240,15 +176,10 @@ public class CustomLogger {
 	
 	
 	public void downloadeComplete(int peerId) {
-		String fileName = "peer_" + peerId +"/log_peer_"+ peerId + ".log";
-		
-		if (!new File(fileName).exists()) {
-			createLogFile(peerId);
-        }
 		
 		 try
          {
-             FileWriter fw = new FileWriter(fileName,true);
+             FileWriter fw = new FileWriter(logFile,true);
              BufferedWriter bw = new BufferedWriter(fw);
              String str = getFormattedDateTime()+": Peer " + " has downloaded the complete file.";
              
@@ -263,15 +194,10 @@ public class CustomLogger {
 	}
 	
 	public void incomingTcpConn(int peerId, int requestingPeer) {
-		String fileName = "peer_" + peerId +"/log_peer_"+ peerId + ".log";
-		
-		if (!new File(fileName).exists()) {
-			createLogFile(peerId);
-        }
 		
 		 try
          {
-             FileWriter fw = new FileWriter(fileName,true);
+             FileWriter fw = new FileWriter(logFile,true);
              BufferedWriter bw = new BufferedWriter(fw);
              String str = getFormattedDateTime()+": Peer " + peerId + " is connected from Peer " + requestingPeer + ".";
              
@@ -286,15 +212,10 @@ public class CustomLogger {
 	}
 	
 	public void outgoingTcpConn(int peerId, int requestedPeer) {
-		String fileName = "peer_" + peerId +"/log_peer_"+ peerId + ".log";
-		
-		if (!new File(fileName).exists()) {
-			createLogFile(peerId);
-        }
 		
 		 try
          {
-             FileWriter fw = new FileWriter(fileName,true);
+             FileWriter fw = new FileWriter(logFile,true);
              BufferedWriter bw = new BufferedWriter(fw);
              String str = getFormattedDateTime()+": Peer " + peerId + " makes a connection to Peer " + requestedPeer + ".";
              

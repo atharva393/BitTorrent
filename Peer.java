@@ -28,7 +28,7 @@ public class Peer {
 		this.interestedNeighbors = new ArrayList<Neighbor>();
 		this.unchokeCycle = new UnchokeCycle(this);
 		this.currentlyUnchokedNeighborIds = new ArrayList<Integer>();
-		this.logger = new CustomLogger();
+		this.logger = new CustomLogger(this.peerInfo.getId());
 		startServer(peerInfo);
 		createConnections(peersToConnect);
 	}
