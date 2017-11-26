@@ -19,16 +19,6 @@ public class CustomLogger {
 	}
 	
 	public void createLogFile(int peerId){
-		
-		File directory = new File("peer_" + peerId);
-		
-        if (!directory.exists()) {
-            if (directory.mkdir()) {
-                System.out.println("Directory " + directory + " is created!");
-            } else {
-                System.out.println("Failed to create directory!" + directory);
-            }
-        }
         
         File logFile = new File("peer_" + peerId + "/log_peer_" + peerId + ".log");
         

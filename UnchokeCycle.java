@@ -98,7 +98,17 @@ public class UnchokeCycle {
 					if(isChanged) {
 						peer.getLogger().changeInPreferredNeighbors(peer.getPeerInfo().getId(), currentlyUnchokedNeighbors.toString());
 					}
-
+					
+					for(int i : sendUnchokeMessageTo) {
+						try {
+							outputStream = peer.getConnectionMap().get(i).getRequestSocket()
+									.getOutputStream();
+							outputStream.write(UnchokeMessage.createUnchokeMessage());
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+					
 					previousUnchokeTime = System.currentTimeMillis();
 
 				}
