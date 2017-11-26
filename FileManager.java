@@ -21,14 +21,14 @@ public class FileManager {
 	
 	FileManager(PeerInfo peerInfo){
 		CommonConfig commonConfig = CommonConfig.getCommonProperties();
-		customBitField = new CustomBitField(commonConfig.getFileSize()/commonConfig.getPieceSize());
-		if(peerInfo.hasFile) {
+		customBitField = new CustomBitField((int) Math.ceil((commonConfig.getFileSize() * 1.0)/commonConfig.getPieceSize()));
+		if(peerInfo.isHasFile()) {
 			this.customBitField.setAll();
 		}
 		this.fileName = commonConfig.getFileName();
 		this.fileSize = commonConfig.getFileSize();
 		this.pieceSize = commonConfig.getPieceSize();
-		this.directoryName = "peer_" + peerInfo.id + "/";
+		this.directoryName = "peer_" + peerInfo.getId() + "/";
 		File parentDirectory = new File(directoryName);
 		
 		if(!parentDirectory.exists())
@@ -78,7 +78,7 @@ public class FileManager {
 		fileInputStream.skip(index * pieceSize);
 		byte[] piece = new byte[Math.min(fileSize - index * pieceSize, pieceSize)];
 		fileInputStream.read(piece);
-		//System.out.println("Read from file:" + new String(piece));
+		
 		fileInputStream.close();
 		return piece;
 

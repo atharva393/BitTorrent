@@ -17,25 +17,27 @@ import messages.PieceMessage;
 import messages.RequestMessage;
 
 public class MessageHandler implements Runnable {
+	
+	private Peer peer;
 	private Socket socket;
-	InputStream inputStream;
-	OutputStream outputStream;
-	FileManager fileManager;
-	int neighborPeerId;
-	Map<Integer, Neighbor> connectionMap;
+	private InputStream inputStream;
+	private OutputStream outputStream;
+	private FileManager fileManager;
+	private int neighborPeerId;
+	private Map<Integer, Neighbor> connectionMap;
 	private List<Neighbor> interestedNeighbors;
 	private UnchokeCycle unchokeCycle;
 	private Map<Integer, PeerInfo> peerInfoMap;
 	
-	MessageHandler(Socket connectionSocket, FileManager fileManager, int peerId, Map<Integer, Neighbor> connectionMap,
-			List<Neighbor> interestedNeighbors, UnchokeCycle unchokeCycle, Map<Integer, PeerInfo> peerInfoMap) {
+	MessageHandler(Socket connectionSocket, Peer peer, int neighborPeerId) {
+		this.peer = peer;
 		this.socket = connectionSocket;
-		this.fileManager = fileManager;
-		this.neighborPeerId = peerId;
-		this.connectionMap = connectionMap;
-		this.interestedNeighbors = interestedNeighbors;
-		this.unchokeCycle = unchokeCycle;
-		this.peerInfoMap = peerInfoMap;
+		this.fileManager = peer.getFileManager();
+		this.neighborPeerId = neighborPeerId;
+		this.connectionMap = peer.getConnectionMap();
+		this.interestedNeighbors = peer.getInterestedNeighbors();
+		this.unchokeCycle = peer.getUnchokeCycle();
+		this.peerInfoMap = peer.getPeerInfoMap();
 	}
 
 	@Override
@@ -121,6 +123,9 @@ public class MessageHandler implements Runnable {
 
 	private void handleNotInterstedMsg() {
 		connectionMap.get(neighborPeerId).setInterested(false);
+		
+		peer.getLogger().receivedNotInterested(peer.getPeerInfo().getId(), neighborPeerId);
+		
 		if(interestedNeighbors.contains(connectionMap.get(neighborPeerId))){
 			interestedNeighbors.remove(connectionMap.get(neighborPeerId));
 		}
@@ -128,6 +133,9 @@ public class MessageHandler implements Runnable {
 
 	private void handleInterestedMsg() {
 		connectionMap.get(neighborPeerId).setInterested(true);
+		
+		peer.getLogger().receivedInterested(peer.getPeerInfo().getId(), neighborPeerId);
+		
 		interestedNeighbors.add(connectionMap.get(neighborPeerId));
 	}
 
@@ -138,6 +146,9 @@ public class MessageHandler implements Runnable {
 		fileManager.getRequestPieceMap().remove(neighborPeerId);
 		connectionMap.get(neighborPeerId).incrementNumberOfReceivedPieces();
 		fileManager.writePieceToFile(index, Arrays.copyOfRange(pieceInfo, 4, pieceInfo.length));
+		
+		peer.getLogger().downloadedPiece(peer.getPeerInfo().getId(), index, neighborPeerId, fileManager.getCustomBitField().getTotalPiecesReceived());
+		
 		sendHaveMsgToAll(index);
 				
 		for(Map.Entry<Integer, Neighbor> neighbor : connectionMap.entrySet()) {
@@ -154,6 +165,9 @@ public class MessageHandler implements Runnable {
 		}
 		
 		if(fileManager.getCustomBitField().hasAll()){
+			
+			peer.getLogger().downloadeComplete(peer.getPeerInfo().getId());
+			
 			checkIfEveryoneHasFile();
 		} else{
 			sendPieceRequest();
@@ -171,7 +185,10 @@ public class MessageHandler implements Runnable {
 	}
 
 	private void handleHaveMsg(int index) {
+		
 		connectionMap.get(neighborPeerId).getNeighborBitField().set(index);
+		
+		peer.getLogger().receivedHave(peer.getPeerInfo().getId(), neighborPeerId, index);
 		
 		if(!fileManager.getCustomBitField().getBitSet().get(index)){
 			byte[] interestedMessage;
@@ -193,6 +210,8 @@ public class MessageHandler implements Runnable {
 
 	private void handleUnChokeMsg() {
 		connectionMap.get(neighborPeerId).setChokingMe(false);
+		
+		peer.getLogger().unchoke(peer.getPeerInfo().getId(), neighborPeerId);
 		
 		connectionMap.get(neighborPeerId).setUnchokedAt(System.currentTimeMillis());
 		
@@ -261,6 +280,8 @@ public class MessageHandler implements Runnable {
 	private void handleChokeMsg() {
 		
 		connectionMap.get(neighborPeerId).setChokingMe(true);
+		
+		peer.getLogger().choke(peer.getPeerInfo().getId(), neighborPeerId);
 		
 		Neighbor neighbor = connectionMap.get(neighborPeerId);
 		neighbor.setDownloadRate(neighbor.getNumberOfReceivedPieces() * 1.0 / (System.currentTimeMillis() - neighbor.getUnchokedAt()));

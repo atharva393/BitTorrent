@@ -52,27 +52,37 @@ public class UnchokeCycle {
 					System.out.println("Interested count : " + peer.getInterestedNeighbors().size());
 					List<Neighbor> newUnchokedNeighbors = selectNewUnchokedNeighbors();
 					List<Integer> currentlyUnchokedNeighbors = peer.getCurrentlyUnchokedNeighborIds();
+					
 					List<Integer> toChokeList = new ArrayList<>(currentlyUnchokedNeighbors);
-
+					
+					List<Integer> sendUnchokeMessageTo = new ArrayList<>();
+					
+					boolean isChanged = false;
+					
 					for (Neighbor n : newUnchokedNeighbors) {
-						if (toChokeList.contains(n.getPeerInfo().id)) {
-							toChokeList.remove(new Integer(n.getPeerInfo().id));
+						
+						if(!currentlyUnchokedNeighbors.contains(n.getPeerInfo().getId()))
+							isChanged = true;
+						if (toChokeList.contains(n.getPeerInfo().getId())) {
+							toChokeList.remove(new Integer(n.getPeerInfo().getId()));
 						} else {
 							// send unchoked msg
-							try {
+							/*try {
 								outputStream = peer.getConnectionMap().get(n.getPeerInfo().id).getRequestSocket()
 										.getOutputStream();
 								outputStream.write(UnchokeMessage.createUnchokeMessage());
 							} catch (IOException e) {
 								e.printStackTrace();
-							}
-
-							currentlyUnchokedNeighbors.add(n.getPeerInfo().id);
+							}*/
+							
+							sendUnchokeMessageTo.add(n.getPeerInfo().getId());
+							
+							currentlyUnchokedNeighbors.add(n.getPeerInfo().getId());
 						}
 					}
 
 					currentlyUnchokedNeighbors.removeAll(toChokeList);
-
+					
 					for (int i : toChokeList) {
 						// send choked msg
 						try {
@@ -84,6 +94,10 @@ public class UnchokeCycle {
 						}
 
 					}
+					
+					if(isChanged) {
+						peer.getLogger().changeInPreferredNeighbors(peer.getPeerInfo().getId(), currentlyUnchokedNeighbors.toString());
+					}
 
 					previousUnchokeTime = System.currentTimeMillis();
 
@@ -93,7 +107,7 @@ public class UnchokeCycle {
 		}
 
 		public List<Neighbor> selectNewUnchokedNeighbors() {
-			if (!peer.peerInfo.hasFile)
+			if (!peer.getPeerInfo().isHasFile())
 				return selectUnchokedNeighborsBasedOnDownloadingRate();
 			return selectNeighborRandomly();
 		}
@@ -141,9 +155,11 @@ public class UnchokeCycle {
 					if (neighborToUnchoke != null) {
 
 						try {
-							outputstream = peer.getConnectionMap().get(neighborToUnchoke.getPeerInfo().id)
+							outputstream = peer.getConnectionMap().get(neighborToUnchoke.getPeerInfo().getId())
 									.getRequestSocket().getOutputStream();
-
+							
+							peer.getLogger().optimUnchokedNeighbor(peer.getPeerInfo().getId(), neighborToUnchoke.getPeerInfo().getId());
+							
 							outputstream.write(UnchokeMessage.createUnchokeMessage());
 
 						} catch (IOException e) {

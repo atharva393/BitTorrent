@@ -10,8 +10,8 @@ public class SocketDetails {
  	
 	public SocketDetails(PeerInfo peerInfo){
 		try {
-			requestSocket = new Socket(peerInfo.name, peerInfo.port);
-			System.out.println("Connected to " + peerInfo.name + " on port " + peerInfo.port);
+			requestSocket = new Socket(peerInfo.getName(), peerInfo.getPort());
+			System.out.println("Connected to " + peerInfo.getName() + " on port " + peerInfo.getPort());
 			out = requestSocket.getOutputStream();
 			out.flush();
 			in = requestSocket.getInputStream();

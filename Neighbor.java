@@ -25,7 +25,7 @@ public class Neighbor {
 	public Neighbor(PeerInfo peerInfo) {
 		this.peerInfo = peerInfo;
 		try {
-			this.requestSocket = new Socket(peerInfo.name, peerInfo.port);
+			this.requestSocket = new Socket(peerInfo.getName(), peerInfo.getPort());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -18,7 +18,7 @@ public class CustomLogger {
 		
 	}
 	
-	public void createLogFile(String peerId){
+	public void createLogFile(int peerId){
 		
 		File directory = new File("peer_" + peerId);
 		
@@ -56,7 +56,7 @@ public class CustomLogger {
 		}
 	}
 	
-	public void changeInPreferredNeighbors(String peerId, String neighbors){
+	public void changeInPreferredNeighbors(int peerId, String neighbors){
 		String fileName = "peer_" + peerId+"/log_peer_"+peerId+".log";
 		
 		if (!new File(fileName).exists()) {
@@ -88,7 +88,7 @@ public class CustomLogger {
 		
 	}
 	
-	public void optimUnchokedNeighbor(String peerId, String optimUnchokedNeighbor) {
+	public void optimUnchokedNeighbor(int peerId, int optimUnchokedNeighbor) {
 		String fileName = "peer_" + peerId+"/log_peer_"+peerId+".log";
 		
 		if (!new File(fileName).exists()) {
@@ -110,7 +110,7 @@ public class CustomLogger {
           }
 	}
 	
-	public void unchoke(String peerId, String unchokedNeighbor) {
+	public void unchoke(int peerId, int unchokedNeighbor) {
 		String fileName = "peer_" + peerId +"/log_peer_"+ peerId + ".log";
 		
 		if (!new File(fileName).exists()) {
@@ -132,7 +132,7 @@ public class CustomLogger {
           }
 	}
 	
-	public void choke(String peerId, String chokedNeighbor) {
+	public void choke(int peerId, int chokedNeighbor) {
 		String fileName = "peer_" + peerId +"/log_peer_"+ peerId + ".log";
 		
 		if (!new File(fileName).exists()) {
@@ -154,7 +154,7 @@ public class CustomLogger {
           }
 	}
 	
-	public void receivedHave(String peerId, String senderPeer, int pieceIndex) {
+	public void receivedHave(int peerId, int senderPeer, int pieceIndex) {
 		String fileName = "peer_" + peerId +"/log_peer_"+ peerId + ".log";
 		
 		if (!new File(fileName).exists()) {
@@ -178,7 +178,7 @@ public class CustomLogger {
           }
 	}
 	
-	public void receivedInterested(String peerId, String senderPeer) {
+	public void receivedInterested(int peerId, int senderPeer) {
 		String fileName = "peer_" + peerId +"/log_peer_"+ peerId + ".log";
 		
 		if (!new File(fileName).exists()) {
@@ -201,7 +201,7 @@ public class CustomLogger {
           }
 	}
 	
-	public void receivedNotInterested(String peerId, String senderPeer) {
+	public void receivedNotInterested(int peerId, int senderPeer) {
 		String fileName = "peer_" + peerId +"/log_peer_"+ peerId + ".log";
 		
 		if (!new File(fileName).exists()) {
@@ -224,7 +224,7 @@ public class CustomLogger {
           }
 	}
 	
-	public void downloadedPiece(String peerId, int pieceIndex, String senderPeer, int currentPieceNumber) {
+	public void downloadedPiece(int peerId, int pieceIndex, int senderPeer, int currentPieceNumber) {
 		String fileName = "peer_" + peerId +"/log_peer_"+ peerId + ".log";
 		
 		if (!new File(fileName).exists()) {
@@ -249,7 +249,7 @@ public class CustomLogger {
 	}
 	
 	
-	public void downloadeComplete(String peerId) {
+	public void downloadeComplete(int peerId) {
 		String fileName = "peer_" + peerId +"/log_peer_"+ peerId + ".log";
 		
 		if (!new File(fileName).exists()) {
@@ -272,7 +272,7 @@ public class CustomLogger {
           }
 	}
 	
-	public void incomingTcpConn(String peerId, String requestingPeer) {
+	public void incomingTcpConn(int peerId, int requestingPeer) {
 		String fileName = "peer_" + peerId +"/log_peer_"+ peerId + ".log";
 		
 		if (!new File(fileName).exists()) {
@@ -295,7 +295,7 @@ public class CustomLogger {
           }
 	}
 	
-	public void outgoingTcpConn(String peerId, String requestedPeer) {
+	public void outgoingTcpConn(int peerId, int requestedPeer) {
 		String fileName = "peer_" + peerId +"/log_peer_"+ peerId + ".log";
 		
 		if (!new File(fileName).exists()) {

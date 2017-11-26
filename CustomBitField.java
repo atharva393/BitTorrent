@@ -6,7 +6,7 @@ import java.util.BitSet;
  */
 public class CustomBitField {
 	private BitSet bitSet = new BitSet();
-	private int numberOfPieces = (int) Math.ceil(CommonConfig.getCommonProperties().getFileSize() / CommonConfig.getCommonProperties().getPieceSize());
+	private int numberOfPieces = (int) Math.ceil((CommonConfig.getCommonProperties().getFileSize() * 1.0) / CommonConfig.getCommonProperties().getPieceSize());
 	
 	public BitSet getBitSet() {
 		return bitSet;
@@ -42,5 +42,9 @@ public class CustomBitField {
 				return false;
 		}
 		return true;
+	}
+	
+	public synchronized int getTotalPiecesReceived() {
+		return bitSet.cardinality();
 	}
 }

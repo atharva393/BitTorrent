@@ -29,7 +29,7 @@ public class PeerProcess {
 				String[] splittedLine = sc.nextLine().split(" ");
 				PeerInfo peerInfo = new PeerInfo(Integer.parseInt(splittedLine[0]), splittedLine[1],
 						Integer.parseInt(splittedLine[2]), splittedLine[3].equals("1"));
-				peerInfoMap.put(peerInfo.id, peerInfo);
+				peerInfoMap.put(peerInfo.getId(), peerInfo);
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -45,7 +45,7 @@ public class PeerProcess {
 				String[] splittedLine = sc.nextLine().split(" ");
 				PeerInfo peerInfo = new PeerInfo(Integer.parseInt(splittedLine[0]), splittedLine[1],
 						Integer.parseInt(splittedLine[2]), splittedLine[3].equals("1"));
-				if (peerInfo.id != thisPeerId) {
+				if (peerInfo.getId() != thisPeerId) {
 					peersToConnect.add(peerInfo);
 				} else {
 					peer = new Peer(peerInfo, peersToConnect,peerInfoMap);

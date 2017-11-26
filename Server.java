@@ -1,6 +1,4 @@
 import java.net.*;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import messages.BitFieldMessage;
@@ -10,24 +8,25 @@ import java.io.*;
 
 public class Server implements Runnable {
 
+	private Peer peer;
 	private ServerSocket welcomingSocket;
-	Map<Integer, Neighbor> connectionMap;
-	FileManager fileManager;
-	int myPeerId;
-	Map<Integer, PeerInfo> peerInfoMap;
-	private List<Neighbor> interestedNeighbors;
+	private Map<Integer, Neighbor> connectionMap;
+	private FileManager fileManager;
+	private int myPeerId;
+	private Map<Integer, PeerInfo> peerInfoMap;
 	private UnchokeCycle unchokeCycle;
+	private CustomLogger logger;
 	
-	public Server(int peerId, int sPort, HashMap<Integer, Neighbor> connectionMap, FileManager fileManager,
-			Map<Integer, PeerInfo> peerInfoMap, List<Neighbor> interestedNeighbors, UnchokeCycle unchokeCycle) {
+	public Server(Peer peer) {
 		try {
-			this.myPeerId = peerId;
-			this.connectionMap = connectionMap;
-			this.welcomingSocket = new ServerSocket(sPort);
-			this.fileManager = fileManager;
-			this.peerInfoMap = peerInfoMap;
-			this.interestedNeighbors = interestedNeighbors;
-			this.unchokeCycle = unchokeCycle;
+			this.peer = peer;
+			this.myPeerId = peer.getPeerInfo().getId();
+			this.connectionMap = peer.getConnectionMap();
+			this.welcomingSocket = new ServerSocket(peer.getPeerInfo().getPort());
+			this.fileManager = peer.getFileManager();
+			this.peerInfoMap = peer.getPeerInfoMap();
+			this.unchokeCycle = peer.getUnchokeCycle();
+			this.logger = peer.getLogger();
 		} catch (Exception e) {
 			System.out.println("error creating server");
 		}
@@ -49,8 +48,10 @@ public class Server implements Runnable {
 
 				int neighborPeerId = HandshakeMessage.validateHandshakeMsg(msg);
 				connectionMap.put(neighborPeerId, new Neighbor(peerInfoMap.get(neighborPeerId), connectionSocket));
-				System.out.println("Receive message: " + new String(msg, "US-ASCII") + " from client ");
-
+				//System.out.println("Receive message: " + new String(msg, "US-ASCII") + " from client ");
+				
+				logger.incomingTcpConn(myPeerId, neighborPeerId);
+				
 				outputStream.write(HandshakeMessage.createHandshakeMessage(myPeerId));
 				
 				if(unchokeCycle.isCycleStopped()){
@@ -58,7 +59,7 @@ public class Server implements Runnable {
 					unchokeCycle.beginCycle();
 				}
 				
-				Thread t = new Thread(new MessageHandler(connectionSocket, fileManager, neighborPeerId, connectionMap, interestedNeighbors, unchokeCycle, peerInfoMap));
+				Thread t = new Thread(new MessageHandler(connectionSocket, peer, neighborPeerId));
 				t.start();
 				byte[] bitFieldMsg;
 				
