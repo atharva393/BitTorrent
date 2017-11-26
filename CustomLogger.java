@@ -66,7 +66,7 @@ public class CustomLogger {
           }
 	}
 	
-	public void unchoke(int peerId, int unchokedNeighbor) {
+	public void unchoke(int unchokedNeighbor,int peerId ) {
 		
 		 try
          {
@@ -107,7 +107,7 @@ public class CustomLogger {
              FileWriter fw = new FileWriter(logFile,true);
              BufferedWriter bw = new BufferedWriter(fw);
              String str = getFormattedDateTime()+": Peer " + peerId + " received the \'have\' message from " 
-            		 + senderPeer + "for the piece " + pieceIndex + ".";
+            		 + senderPeer + " for the piece " + pieceIndex + ".";
              
              bw.write(str);
              bw.newLine();
@@ -181,7 +181,7 @@ public class CustomLogger {
          {
              FileWriter fw = new FileWriter(logFile,true);
              BufferedWriter bw = new BufferedWriter(fw);
-             String str = getFormattedDateTime()+": Peer " + " has downloaded the complete file.";
+             String str = getFormattedDateTime()+": Peer "+peerId+" has downloaded the complete file.";
              
              bw.write(str);
              bw.newLine();

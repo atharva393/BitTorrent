@@ -23,7 +23,6 @@ public class HandshakeMessage {
 	public static int validateHandshakeMsg(byte [] msg) {
 		System.out.println(new String(msg, 0, 18));
 		if (header.equals(new String(msg, 0, 18))) {
-			System.out.println(getPeerID_Handshake_Message(msg));
 			return getPeerID_Handshake_Message(msg);
 		}
 		return -1;

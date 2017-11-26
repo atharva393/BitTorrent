@@ -49,7 +49,6 @@ public class UnchokeCycle {
 			while (!isCycleStopped()) {
 				if ((System.currentTimeMillis() - previousUnchokeTime) >= unchokingTimeInterval * 1000
 						&& peer.getInterestedNeighbors().size() > 0) {
-					System.out.println("Interested count : " + peer.getInterestedNeighbors().size());
 					List<Neighbor> newUnchokedNeighbors = selectNewUnchokedNeighbors();
 					List<Integer> currentlyUnchokedNeighbors = peer.getCurrentlyUnchokedNeighborIds();
 					
@@ -86,7 +85,6 @@ public class UnchokeCycle {
 					for (int i : toChokeList) {
 						// send choked msg
 						try {
-							System.out.println("sending choke msg to " + i);
 							outputStream = peer.getConnectionMap().get(i).getRequestSocket().getOutputStream();
 							outputStream.write(ChokeMessage.createChokeMessage());
 						} catch (IOException e) {

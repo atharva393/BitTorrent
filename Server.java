@@ -48,7 +48,6 @@ public class Server implements Runnable {
 
 				int neighborPeerId = HandshakeMessage.validateHandshakeMsg(msg);
 				connectionMap.put(neighborPeerId, new Neighbor(peerInfoMap.get(neighborPeerId), connectionSocket));
-				//System.out.println("Receive message: " + new String(msg, "US-ASCII") + " from client ");
 				
 				logger.incomingTcpConn(myPeerId, neighborPeerId);
 				

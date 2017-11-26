@@ -11,7 +11,6 @@ public class SocketDetails {
 	public SocketDetails(PeerInfo peerInfo){
 		try {
 			requestSocket = new Socket(peerInfo.getName(), peerInfo.getPort());
-			System.out.println("Connected to " + peerInfo.getName() + " on port " + peerInfo.getPort());
 			out = requestSocket.getOutputStream();
 			out.flush();
 			in = requestSocket.getInputStream();

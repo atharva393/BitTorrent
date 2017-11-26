@@ -68,26 +68,21 @@ public class MessageHandler implements Runnable {
 
 				switch (messageType) {
 				case 0:
-					System.out.println("choking msg received from " + neighborPeerId);
 					handleChokeMsg();
 					break;
 				case 1:
-					System.out.println("unchoked msg received from " + neighborPeerId);
 					handleUnChokeMsg();
 					break;
 				case 2:
-					System.out.println("received interested msg from " + neighborPeerId);
 					handleInterestedMsg();
 					break;
 				case 3:
-					System.out.println("received not interested msg from " + neighborPeerId);
 					handleNotInterstedMsg();
 					break;
 				case 4:
 					handleHaveMsg(ByteBuffer.wrap(inputStreamByte, 0, 4).getInt());
 					break;
 				case 5:
-					System.out.println("calling bitfield msg handler method");
 					handleBitFieldMsg(BitSet.valueOf(inputStreamByte));
 					break;
 				case 6:
@@ -95,7 +90,6 @@ public class MessageHandler implements Runnable {
 					handleRequestPieceMsg(ByteBuffer.wrap(inputStreamByte, 0, 4).getInt());
 					break;
 				case 7:
-					System.out.println("Piece received from " + neighborPeerId);
 					handlePieceMsg(inputStreamByte);
 					break;
 				}
@@ -112,7 +106,6 @@ public class MessageHandler implements Runnable {
 		
 		try {
 			byte[] piece = fileManager.readPieceFromFile(index);
-			//System.out.println("Piece content in msg handler : " + new String(piece));
 			outputStream.write(PieceMessage.createPieceMessage(index, piece));
 		} catch(FileNotFoundException e){
 			System.out.println("File not found");
@@ -142,7 +135,6 @@ public class MessageHandler implements Runnable {
 	private void handlePieceMsg(byte[] pieceInfo) {
 		//delete entry from requestmap
 		int index = ByteBuffer.wrap(pieceInfo, 0, 4).getInt();
-		System.out.println("Received piece number " + index + " from " + neighborPeerId);
 		fileManager.getRequestPieceMap().remove(neighborPeerId);
 		connectionMap.get(neighborPeerId).incrementNumberOfReceivedPieces();
 		fileManager.writePieceToFile(index, Arrays.copyOfRange(pieceInfo, 4, pieceInfo.length));
@@ -194,7 +186,6 @@ public class MessageHandler implements Runnable {
 			byte[] interestedMessage;
 			try {
 				interestedMessage = InterestedMessage.createInterestedMessage();
-				System.out.println("sending interestd msg");
 				outputStream.write(interestedMessage);
 				if(!connectionMap.get(neighborPeerId).isChokingMe())
 					sendPieceRequest(index);
@@ -202,7 +193,7 @@ public class MessageHandler implements Runnable {
 				e.printStackTrace();
 			}
 		}
-		System.out.println("Bitset of " + neighborPeerId + connectionMap.get(neighborPeerId).getNeighborBitField().getBitSet());
+		
 		if(connectionMap.get(neighborPeerId).getNeighborBitField().hasAll()){
 			checkIfEveryoneHasFile();
 		}
@@ -257,19 +248,16 @@ public class MessageHandler implements Runnable {
 
 	private void handleBitFieldMsg(BitSet neighborBitSet) {
 		BitSet interested = hasMissingPieces(neighborBitSet);
-		System.out.println("I am interested " + interested);
 		connectionMap.get(neighborPeerId).getNeighborBitField().setBitSet(neighborBitSet);
 		
 		try {
 			if (!interested.isEmpty()) {
 				connectionMap.get(neighborPeerId).setAmInterested(true);
 				byte[] interestedMessage = InterestedMessage.createInterestedMessage();
-				System.out.println("sending interestd msg");
 				outputStream.write(interestedMessage);
 			} else {
 				connectionMap.get(neighborPeerId).setAmInterested(false);
 				byte[] notInterestedMessage = NotInterestedMessage.createNotInterestedMessage();
-				System.out.println("sending not interestd msg");
 				outputStream.write(notInterestedMessage);
 			}
 		} catch (IOException e) {
