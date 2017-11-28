@@ -120,7 +120,7 @@ public class UnchokeCycle {
 			return selectNeighborRandomly();
 		}
 
-		public List<Neighbor> selectNeighborRandomly() {
+		public synchronized List<Neighbor> selectNeighborRandomly() {
 			List<Neighbor> interestedNeighborsList = new ArrayList<>(peer.getInterestedNeighbors());
 			Collections.shuffle(interestedNeighborsList);
 			return interestedNeighborsList.subList(0, Math.min(interestedNeighborsList.size(),
@@ -128,16 +128,16 @@ public class UnchokeCycle {
 		}
 
 		private List<Neighbor> selectUnchokedNeighborsBasedOnDownloadingRate() {
-			List<Neighbor> interestedNeighborsList =  new ArrayList<>(peer.getInterestedNeighbors());
-
 			PriorityQueue<Neighbor> newUnchokedNeighbors = new PriorityQueue<Neighbor>(new Comparator<Neighbor>() {
 				public int compare(Neighbor n1, Neighbor n2) {
 					return (int) (n1.getDownloadRate() - n2.getDownloadRate());
 				}
 			});
 
-			for (Neighbor n : interestedNeighborsList) {
-				newUnchokedNeighbors.add(n);
+			synchronized (peer.getInterestedNeighbors()) {
+				for (Neighbor n : peer.getInterestedNeighbors()) {
+					newUnchokedNeighbors.add(n);
+				}
 			}
 
 			int removeNeighbors = newUnchokedNeighbors.size()
@@ -158,7 +158,7 @@ public class UnchokeCycle {
 			while (!isCycleStopped()) {
 				if ((System.currentTimeMillis() - previousOptimisticUnchokeTime) >= optimisticUnchokingTimeInterval * 1000) {
 
-					Neighbor neighborToUnchoke = getChokedNeighborRandomly(new ArrayList<>(peer.getInterestedNeighbors()));
+					Neighbor neighborToUnchoke = getChokedNeighborRandomly(peer.getInterestedNeighbors());
 
 					if (neighborToUnchoke != null) {
 
@@ -182,16 +182,14 @@ public class UnchokeCycle {
 			}
 		}
 
-		private Neighbor getChokedNeighborRandomly(List<Neighbor> interestedNeighbors) {
+		private synchronized Neighbor getChokedNeighborRandomly(List<Neighbor> interestedNeighbors) {
 
 			List<Neighbor> interestedChokedNeighbors = new ArrayList<>(interestedNeighbors);
-
 			for (Neighbor neighbor : interestedNeighbors) {
 				if (!neighbor.isChokedbyMe()) {
 					interestedChokedNeighbors.remove(neighbor);
 				}
 			}
-			
 			if(interestedChokedNeighbors.size()==0)
 				return null;
 			
