@@ -121,14 +121,14 @@ public class UnchokeCycle {
 		}
 
 		public List<Neighbor> selectNeighborRandomly() {
-			List<Neighbor> interestedNeighborsList = peer.getInterestedNeighbors();
+			List<Neighbor> interestedNeighborsList = new ArrayList<>(peer.getInterestedNeighbors());
 			Collections.shuffle(interestedNeighborsList);
 			return interestedNeighborsList.subList(0, Math.min(interestedNeighborsList.size(),
 					CommonConfig.getCommonProperties().getNumberOfPreferredNeighbors()));
 		}
 
 		private List<Neighbor> selectUnchokedNeighborsBasedOnDownloadingRate() {
-			List<Neighbor> interestedNeighborsList = peer.getInterestedNeighbors();
+			List<Neighbor> interestedNeighborsList =  new ArrayList<>(peer.getInterestedNeighbors());
 
 			PriorityQueue<Neighbor> newUnchokedNeighbors = new PriorityQueue<Neighbor>(new Comparator<Neighbor>() {
 				public int compare(Neighbor n1, Neighbor n2) {
@@ -143,7 +143,7 @@ public class UnchokeCycle {
 			int removeNeighbors = newUnchokedNeighbors.size()
 					- CommonConfig.getCommonProperties().getNumberOfPreferredNeighbors();
 
-			while (removeNeighbors > 0) {
+			while (removeNeighbors-- > 0) {
 				newUnchokedNeighbors.remove();
 			}
 			return new ArrayList<>(newUnchokedNeighbors);
@@ -158,7 +158,7 @@ public class UnchokeCycle {
 			while (!isCycleStopped()) {
 				if ((System.currentTimeMillis() - previousOptimisticUnchokeTime) >= optimisticUnchokingTimeInterval * 1000) {
 
-					Neighbor neighborToUnchoke = getChokedNeighborRandomly(peer.getInterestedNeighbors());
+					Neighbor neighborToUnchoke = getChokedNeighborRandomly(new ArrayList<>(peer.getInterestedNeighbors()));
 
 					if (neighborToUnchoke != null) {
 
