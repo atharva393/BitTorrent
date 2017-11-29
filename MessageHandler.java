@@ -322,10 +322,13 @@ public class MessageHandler implements Runnable {
 			synchronized (connectionMap) {
 				for(Map.Entry<Integer, Neighbor> entry : connectionMap.entrySet()){
 					try {
-						System.out.println("Closing the socket for " + entry.getKey());
-						entry.getValue().getRequestSocket().close();
-						interestedNeighbors.remove(entry.getValue());
-						peer.getCurrentlyUnchokedNeighborIds().remove(entry.getKey());
+						if(!entry.getValue().getRequestSocket().isClosed())
+						{
+							System.out.println("Closing the socket for " + entry.getKey());
+							entry.getValue().getRequestSocket().close();
+							interestedNeighbors.remove(entry.getValue());
+							peer.getCurrentlyUnchokedNeighborIds().remove(entry.getKey());
+						}
 					} catch (IOException e) {
 						e.printStackTrace();
 					}

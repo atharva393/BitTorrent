@@ -89,7 +89,7 @@ public class CustomLogger {
          {
              FileWriter fileWriter = new FileWriter(logFile,true);
              BufferedWriter bw = new BufferedWriter(fileWriter);
-             String str = getFormattedDateTime()+": Peer " + chokedNeighbor + " is choked by " + peerId + ".";
+             String str = getFormattedDateTime()+": Peer " + peerId + " is choked by " + chokedNeighbor + ".";
              bw.write(str);
              bw.newLine();
              bw.close();
