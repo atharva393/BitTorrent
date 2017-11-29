@@ -70,7 +70,8 @@ public class MessageHandler implements Runnable {
 
 				switch (messageType) {
 				case 0:
-					handleChokeMsg();
+					if(msgLength == 1)
+						handleChokeMsg();
 					break;
 				case 1:
 					handleUnChokeMsg();

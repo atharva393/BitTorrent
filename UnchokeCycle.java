@@ -155,16 +155,26 @@ public class UnchokeCycle {
 
 	class OptimisticUnchokingCycle implements Runnable {
 		public void run() {
-			/*
+			
 			OutputStream outputstream = null;
 
 			while (!isCycleStopped()) {
 				if ((System.currentTimeMillis() - previousOptimisticUnchokeTime) >= optimisticUnchokingTimeInterval * 1000) {
 
 					Neighbor neighborToUnchoke = getChokedNeighborRandomly(peer.getInterestedNeighbors());
-
+					
 					if (neighborToUnchoke != null) {
-
+						Neighbor temp = peer.getOptimisticallyUnchokedNeighbor();
+						if(temp != null){
+							try {
+								if(!peer.getConnectionMap().get(temp.getPeerInfo().getId()).getRequestSocket().isClosed())
+									peer.getConnectionMap().get(temp.getPeerInfo().getId()).getRequestSocket().getOutputStream().write(ChokeMessage.createChokeMessage());
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+						peer.setOptimisticallyUnchokedNeighbor(neighborToUnchoke);
 						try {
 							if(!peer.getConnectionMap().get(neighborToUnchoke.getPeerInfo().getId())
 									.getRequestSocket().isClosed()) {
@@ -185,7 +195,7 @@ public class UnchokeCycle {
 					}
 					
 				}
-			}*/
+			}
 		}
 
 		private synchronized Neighbor getChokedNeighborRandomly(Vector<Neighbor> interestedNeighbors) {

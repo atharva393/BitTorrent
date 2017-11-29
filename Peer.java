@@ -20,6 +20,7 @@ public class Peer {
 	private Vector<Neighbor> interestedNeighbors;
 	private Vector<Integer> currentlyUnchokedNeighborIds;
 	private CustomLogger logger;
+	private Neighbor optimisticallyUnchokedNeighbor;
 	
 	Peer(PeerInfo peerInfo, ArrayList<PeerInfo> peersToConnect, Map<Integer, PeerInfo> peerInfoMap) {
 		this.peerInfo = peerInfo;
@@ -127,5 +128,13 @@ public class Peer {
 
 	public CustomLogger getLogger() {
 		return logger;
+	}
+
+	public Neighbor getOptimisticallyUnchokedNeighbor() {
+		return optimisticallyUnchokedNeighbor;
+	}
+
+	public void setOptimisticallyUnchokedNeighbor(Neighbor optimisticallyUnchokedNeighbor) {
+		this.optimisticallyUnchokedNeighbor = optimisticallyUnchokedNeighbor;
 	}
 }
