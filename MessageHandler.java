@@ -313,12 +313,7 @@ public class MessageHandler implements Runnable {
 			
 			System.out.println("Stopping the unchoking cycles.");
 			unchokeCycle.setCycleStopped(true);
-			try {
-				socket.close();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			
+						
 			synchronized (connectionMap) {
 				for(Map.Entry<Integer, Neighbor> entry : connectionMap.entrySet()){
 					try {
