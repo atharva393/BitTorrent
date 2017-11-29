@@ -73,12 +73,12 @@ public class UnchokeCycle {
 					}
 
 					currentlyUnchokedNeighbors.removeAll(toChokeList);
-					
+					Neighbor oldOptimNeighbor = peer.getOptimisticallyUnchokedNeighbor();
 					for (int i : toChokeList) {
 						// send choked msg
 						try {
 							if(!peer.getConnectionMap().get(i).getRequestSocket().isClosed()
-									&& !(peer.getOptimisticallyUnchokedNeighbor().getPeerInfo().getId() == i)) {
+									&& (oldOptimNeighbor != null && oldOptimNeighbor.getPeerInfo().getId() != i)) {
 								outputStream = peer.getConnectionMap().get(i).getRequestSocket().getOutputStream();
 								outputStream.write(ChokeMessage.createChokeMessage());
 								peer.getConnectionMap().get(i).setChokedbyMe(true);
@@ -180,7 +180,7 @@ public class UnchokeCycle {
 								peer.getLogger().optimUnchokedNeighbor(peer.getPeerInfo().getId(), neighborToUnchoke.getPeerInfo().getId());
 							
 								outputstream.write(UnchokeMessage.createUnchokeMessage());
-								peer.getCurrentlyUnchokedNeighborIds().add(peer.getPeerInfo().getId());
+								
 								peer.getConnectionMap().get(neighborToUnchoke.getPeerInfo().getId()).setChokedbyMe(false);
 							}
 
