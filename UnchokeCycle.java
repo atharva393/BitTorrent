@@ -139,10 +139,8 @@ public class UnchokeCycle {
 				}
 			});
 
-			synchronized (peer.getInterestedNeighbors()) {
-				for (Neighbor n : peer.getInterestedNeighbors()) {
+			for (Neighbor n : peer.getInterestedNeighbors()) {
 					newUnchokedNeighbors.add(n);
-				}
 			}
 
 			int removeNeighbors = newUnchokedNeighbors.size()
@@ -157,7 +155,7 @@ public class UnchokeCycle {
 
 	class OptimisticUnchokingCycle implements Runnable {
 		public void run() {
-
+			/*
 			OutputStream outputstream = null;
 
 			while (!isCycleStopped()) {
@@ -187,16 +185,14 @@ public class UnchokeCycle {
 					}
 					
 				}
-			}
+			}*/
 		}
 
 		private synchronized Neighbor getChokedNeighborRandomly(Vector<Neighbor> interestedNeighbors) {
 			List<Neighbor> interestedChokedNeighbors = new ArrayList<>(interestedNeighbors);
-			synchronized (interestedNeighbors) {
-				for (Neighbor neighbor : interestedNeighbors) {
-					if (!neighbor.isChokedbyMe()) {
-						interestedChokedNeighbors.remove(neighbor);
-					}
+			for (Neighbor neighbor : interestedNeighbors) {
+				if (!neighbor.isChokedbyMe()) {
+					interestedChokedNeighbors.remove(neighbor);
 				}
 			}
 			

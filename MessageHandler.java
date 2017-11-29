@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 
 import messages.HaveMessage;
 import messages.InterestedMessage;
@@ -63,8 +64,8 @@ public class MessageHandler implements Runnable {
 				byte[] inputStreamByte = null;
 
 				if (msgLength > 1) {
-					inputStreamByte = new byte[msgLength];
-					inputStream.read(inputStreamByte, 0, msgLength);
+					inputStreamByte = new byte[msgLength-1];
+					inputStream.read(inputStreamByte, 0, msgLength-1);
 				}
 
 				switch (messageType) {
@@ -87,7 +88,7 @@ public class MessageHandler implements Runnable {
 					handleBitFieldMsg(BitSet.valueOf(inputStreamByte));
 					break;
 				case 6:
-					System.out.println("Request msg received by " + neighborPeerId);
+					//System.out.println("Request msg received by " + neighborPeerId);
 					handleRequestPieceMsg(ByteBuffer.wrap(inputStreamByte, 0, 4).getInt());
 					break;
 				case 7:
@@ -104,7 +105,7 @@ public class MessageHandler implements Runnable {
 	private void handleRequestPieceMsg(int index) {
 		if(!fileManager.getCustomBitField().getBitSet().get(index))
 			return;
-		
+		System.out.println("Request msg received by " + neighborPeerId + " for " + index);
 		try {
 			byte[] piece = fileManager.readPieceFromFile(index);
 			outputStream.write(PieceMessage.createPieceMessage(index, piece));
@@ -144,20 +145,19 @@ public class MessageHandler implements Runnable {
 		
 		sendHaveMsgToAll(index);
 				
-		synchronized (pieceInfo) {
-			for(Map.Entry<Integer, Neighbor> neighbor : connectionMap.entrySet()) {
-				if(neighbor.getValue().isAmInterested() && 
-						hasMissingPieces(neighbor.getValue().getNeighborBitField().getBitSet()).isEmpty()) {
-					neighbor.getValue().setAmInterested(false);
-					try {
-						outputStream.write(NotInterestedMessage.createNotInterestedMessage());
-					} catch (IOException e) {
-						System.out.println("Error occurred while sending not interested msg from handlePiecemsg method");
-						e.printStackTrace();
-					}
+		for(Map.Entry<Integer, Neighbor> neighbor : connectionMap.entrySet()) {
+			if(neighbor.getValue().isAmInterested() && 
+					hasMissingPieces(neighbor.getValue().getNeighborBitField().getBitSet()).isEmpty()) {
+				neighbor.getValue().setAmInterested(false);
+				try {
+					neighbor.getValue().getRequestSocket().getOutputStream().write(NotInterestedMessage.createNotInterestedMessage());
+				} catch (IOException e) {
+					System.out.println("Error occurred while sending not interested msg from handlePiecemsg method");
+					e.printStackTrace();
 				}
 			}
 		}
+
 		if(fileManager.getCustomBitField().hasAll()){
 			peer.getPeerInfo().setHasFile(true);
 			peer.getLogger().downloadeComplete(peer.getPeerInfo().getId());
@@ -169,15 +169,15 @@ public class MessageHandler implements Runnable {
 	}
 
 	private void sendHaveMsgToAll(int index) {
-		synchronized (connectionMap) {
-			for(Map.Entry<Integer, Neighbor> entry : connectionMap.entrySet()){
-				try {
-					entry.getValue().getRequestSocket().getOutputStream().write(HaveMessage.createHaveMessage(index));
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+
+		for(Map.Entry<Integer, Neighbor> entry : connectionMap.entrySet()){
+			try {
+				entry.getValue().getRequestSocket().getOutputStream().write(HaveMessage.createHaveMessage(index));
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
+		
 	}
 
 	private void handleHaveMsg(int index) {
@@ -303,30 +303,26 @@ public class MessageHandler implements Runnable {
 	
 	public void checkIfEveryoneHasFile(){
 		if(fileManager.getCustomBitField().hasAll()){
-			synchronized (connectionMap) {		
-				for(Map.Entry<Integer, Neighbor> entry : connectionMap.entrySet()){
-					if(!entry.getValue().getNeighborBitField().hasAll()){
-						return;
-					}
+			for(Map.Entry<Integer, Neighbor> entry : connectionMap.entrySet()){
+				if(!entry.getValue().getNeighborBitField().hasAll()){
+					return;
 				}
 			}
-			
+
 			System.out.println("Stopping the unchoking cycles.");
 			unchokeCycle.setCycleStopped(true);
 						
-			synchronized (connectionMap) {
-				for(Map.Entry<Integer, Neighbor> entry : connectionMap.entrySet()){
-					try {
-						if(!entry.getValue().getRequestSocket().isClosed())
-						{
-							System.out.println("Closing the socket for " + entry.getKey());
-							entry.getValue().getRequestSocket().close();
-							interestedNeighbors.remove(entry.getValue());
-							peer.getCurrentlyUnchokedNeighborIds().remove(entry.getKey());
-						}
-					} catch (IOException e) {
-						e.printStackTrace();
+			for(Map.Entry<Integer, Neighbor> entry : connectionMap.entrySet()){
+				try {
+					if(!entry.getValue().getRequestSocket().isClosed())
+					{
+						System.out.println("Closing the socket for " + entry.getKey());
+						entry.getValue().getRequestSocket().close();
+						interestedNeighbors.remove(entry.getValue());
+						peer.getCurrentlyUnchokedNeighborIds().remove(entry.getKey());
 					}
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
 			
