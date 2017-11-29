@@ -85,8 +85,10 @@ public class UnchokeCycle {
 					for (int i : toChokeList) {
 						// send choked msg
 						try {
-							outputStream = peer.getConnectionMap().get(i).getRequestSocket().getOutputStream();
-							outputStream.write(ChokeMessage.createChokeMessage());
+							if(!peer.getConnectionMap().get(i).getRequestSocket().isClosed()) {
+								outputStream = peer.getConnectionMap().get(i).getRequestSocket().getOutputStream();
+								outputStream.write(ChokeMessage.createChokeMessage());
+							}
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
@@ -99,9 +101,11 @@ public class UnchokeCycle {
 					
 					for(int i : sendUnchokeMessageTo) {
 						try {
-							outputStream = peer.getConnectionMap().get(i).getRequestSocket()
+							if(!peer.getConnectionMap().get(i).getRequestSocket().isClosed()){
+								outputStream = peer.getConnectionMap().get(i).getRequestSocket()
 									.getOutputStream();
-							outputStream.write(UnchokeMessage.createUnchokeMessage());
+								outputStream.write(UnchokeMessage.createUnchokeMessage());
+							}
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
@@ -163,12 +167,15 @@ public class UnchokeCycle {
 					if (neighborToUnchoke != null) {
 
 						try {
-							outputstream = peer.getConnectionMap().get(neighborToUnchoke.getPeerInfo().getId())
+							if(!peer.getConnectionMap().get(neighborToUnchoke.getPeerInfo().getId())
+									.getRequestSocket().isClosed()) {
+								outputstream = peer.getConnectionMap().get(neighborToUnchoke.getPeerInfo().getId())
 									.getRequestSocket().getOutputStream();
 							
-							peer.getLogger().optimUnchokedNeighbor(peer.getPeerInfo().getId(), neighborToUnchoke.getPeerInfo().getId());
+								peer.getLogger().optimUnchokedNeighbor(peer.getPeerInfo().getId(), neighborToUnchoke.getPeerInfo().getId());
 							
-							outputstream.write(UnchokeMessage.createUnchokeMessage());
+								outputstream.write(UnchokeMessage.createUnchokeMessage());
+							}
 
 						} catch (IOException e) {
 							e.printStackTrace();

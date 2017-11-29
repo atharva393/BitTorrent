@@ -158,7 +158,7 @@ public class MessageHandler implements Runnable {
 			}
 		}
 		if(fileManager.getCustomBitField().hasAll()){
-			
+			peer.getPeerInfo().setHasFile(true);
 			peer.getLogger().downloadeComplete(peer.getPeerInfo().getId());
 			
 			checkIfEveryoneHasFile();
@@ -318,11 +318,13 @@ public class MessageHandler implements Runnable {
 				e1.printStackTrace();
 			}
 			
-			synchronized (connectionMap) {	
+			synchronized (connectionMap) {
 				for(Map.Entry<Integer, Neighbor> entry : connectionMap.entrySet()){
 					try {
 						System.out.println("Closing the socket for " + entry.getKey());
 						entry.getValue().getRequestSocket().close();
+						interestedNeighbors.remove(entry.getValue());
+						peer.getCurrentlyUnchokedNeighborIds().remove(entry.getKey());
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
