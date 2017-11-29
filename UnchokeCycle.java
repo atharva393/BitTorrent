@@ -190,13 +190,15 @@ public class UnchokeCycle {
 		}
 
 		private synchronized Neighbor getChokedNeighborRandomly(List<Neighbor> interestedNeighbors) {
-
 			List<Neighbor> interestedChokedNeighbors = new ArrayList<>(interestedNeighbors);
-			for (Neighbor neighbor : interestedNeighbors) {
-				if (!neighbor.isChokedbyMe()) {
-					interestedChokedNeighbors.remove(neighbor);
+			synchronized (interestedNeighbors) {
+				for (Neighbor neighbor : interestedNeighbors) {
+					if (!neighbor.isChokedbyMe()) {
+						interestedChokedNeighbors.remove(neighbor);
+					}
 				}
 			}
+			
 			if(interestedChokedNeighbors.size()==0)
 				return null;
 			
