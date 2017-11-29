@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import messages.BitFieldMessage;
 import messages.HandshakeMessage;
@@ -16,8 +17,8 @@ public class Peer {
 	private FileManager fileManager;
 	private Map<Integer, PeerInfo> peerInfoMap;
 	private UnchokeCycle unchokeCycle;
-	private List<Neighbor> interestedNeighbors;
-	private List<Integer> currentlyUnchokedNeighborIds;
+	private Vector<Neighbor> interestedNeighbors;
+	private Vector<Integer> currentlyUnchokedNeighborIds;
 	private CustomLogger logger;
 	
 	Peer(PeerInfo peerInfo, ArrayList<PeerInfo> peersToConnect, Map<Integer, PeerInfo> peerInfoMap) {
@@ -25,9 +26,9 @@ public class Peer {
 		this.connectionMap = new HashMap<>();
 		this.fileManager = new FileManager(peerInfo);
 		this.peerInfoMap = peerInfoMap;
-		this.interestedNeighbors = new ArrayList<Neighbor>();
+		this.interestedNeighbors = new Vector<Neighbor>();
 		this.unchokeCycle = new UnchokeCycle(this);
-		this.currentlyUnchokedNeighborIds = new ArrayList<Integer>();
+		this.currentlyUnchokedNeighborIds = new Vector<Integer>();
 		this.logger = new CustomLogger(this.peerInfo.getId());
 		startServer(peerInfo);
 		createConnections(peersToConnect);
@@ -108,19 +109,19 @@ public class Peer {
 		}
 	}
 
-	public List<Neighbor> getInterestedNeighbors() {
+	public Vector<Neighbor> getInterestedNeighbors() {
 		return interestedNeighbors;
 	}
 
-	public void setInterestedNeighbors(List<Neighbor> interestedNeighbors) {
+	public void setInterestedNeighbors(Vector<Neighbor> interestedNeighbors) {
 		this.interestedNeighbors = interestedNeighbors;
 	}
 
-	public List<Integer> getCurrentlyUnchokedNeighborIds() {
+	public Vector<Integer> getCurrentlyUnchokedNeighborIds() {
 		return currentlyUnchokedNeighborIds;
 	}
 
-	public void setCurrentlyUnchokedNeighborIds(List<Integer> currentlyUnchokedNeighborIds) {
+	public void setCurrentlyUnchokedNeighborIds(Vector<Integer> currentlyUnchokedNeighborIds) {
 		this.currentlyUnchokedNeighborIds = currentlyUnchokedNeighborIds;
 	}
 

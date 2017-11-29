@@ -9,6 +9,7 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Vector;
 
 import messages.HaveMessage;
 import messages.InterestedMessage;
@@ -25,7 +26,7 @@ public class MessageHandler implements Runnable {
 	private FileManager fileManager;
 	private int neighborPeerId;
 	private Map<Integer, Neighbor> connectionMap;
-	private List<Neighbor> interestedNeighbors;
+	private Vector<Neighbor> interestedNeighbors;
 	private UnchokeCycle unchokeCycle;
 	private Map<Integer, PeerInfo> peerInfoMap;
 	

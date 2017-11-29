@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Random;
+import java.util.Vector;
 
 import messages.ChokeMessage;
 import messages.UnchokeMessage;
@@ -50,7 +51,7 @@ public class UnchokeCycle {
 				if ((System.currentTimeMillis() - previousUnchokeTime) >= unchokingTimeInterval * 1000
 						&& peer.getInterestedNeighbors().size() > 0) {
 					List<Neighbor> newUnchokedNeighbors = selectNewUnchokedNeighbors();
-					List<Integer> currentlyUnchokedNeighbors = peer.getCurrentlyUnchokedNeighborIds();
+					Vector<Integer> currentlyUnchokedNeighbors = peer.getCurrentlyUnchokedNeighborIds();
 					
 					List<Integer> toChokeList = new ArrayList<>(currentlyUnchokedNeighbors);
 					
@@ -189,7 +190,7 @@ public class UnchokeCycle {
 			}
 		}
 
-		private synchronized Neighbor getChokedNeighborRandomly(List<Neighbor> interestedNeighbors) {
+		private synchronized Neighbor getChokedNeighborRandomly(Vector<Neighbor> interestedNeighbors) {
 			List<Neighbor> interestedChokedNeighbors = new ArrayList<>(interestedNeighbors);
 			synchronized (interestedNeighbors) {
 				for (Neighbor neighbor : interestedNeighbors) {
