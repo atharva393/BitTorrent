@@ -150,60 +150,56 @@ public class UnchokeCycle {
 	class OptimisticUnchokingCycle implements Runnable {
 		public void run() {
 			
-			OutputStream outputstream = null;
-
-			while (!isCycleStopped()) {
-				if ((System.currentTimeMillis() - previousOptimisticUnchokeTime) >= optimisticUnchokingTimeInterval * 1000) {
-
-					Neighbor neighborToUnchoke = getChokedNeighborRandomly(new Vector<>(peer.getInterestedNeighbors()));
-					
-					if (neighborToUnchoke != null) {
-						Neighbor temp = peer.getOptimisticallyUnchokedNeighbor();
-						if(temp != null){
-							try {
-								if(!peer.getConnectionMap().get(temp.getPeerInfo().getId()).getRequestSocket().isClosed()
-										&& !peer.getCurrentlyUnchokedNeighborIds().contains(temp.getPeerInfo().getId())){
-									outputstream = peer.getConnectionMap().get(temp.getPeerInfo().getId()).getRequestSocket().getOutputStream();
-									outputstream.write(ChokeMessage.createChokeMessage());
-									peer.getConnectionMap().get(temp.getPeerInfo().getId()).setChokedbyMe(true);
-								}
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-						}
-						peer.setOptimisticallyUnchokedNeighbor(neighborToUnchoke);
-						System.out.println("Optimistically unchoked - " + neighborToUnchoke.getPeerInfo().getId());
-						try {
-							if(!peer.getConnectionMap().get(neighborToUnchoke.getPeerInfo().getId()).getRequestSocket().isClosed()) {
-								outputstream = peer.getConnectionMap().get(neighborToUnchoke.getPeerInfo().getId()).getRequestSocket().getOutputStream();
-							
-								peer.getLogger().optimUnchokedNeighbor(peer.getPeerInfo().getId(), neighborToUnchoke.getPeerInfo().getId());
-							
-								outputstream.write(UnchokeMessage.createUnchokeMessage());
-								
-								peer.getConnectionMap().get(neighborToUnchoke.getPeerInfo().getId()).setChokedbyMe(false);
-							}
-
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-
-						previousOptimisticUnchokeTime = System.currentTimeMillis();
-
-					}
-					
-				}
-			}
+//			OutputStream outputstream = null;
+//
+//			while (!isCycleStopped()) {
+//				if ((System.currentTimeMillis() - previousOptimisticUnchokeTime) >= optimisticUnchokingTimeInterval * 1000) {
+//
+//					Neighbor neighborToUnchoke = getChokedNeighborRandomly(new Vector<>(peer.getInterestedNeighbors()));
+//					
+//					if (neighborToUnchoke != null) {
+//						Neighbor temp = peer.getOptimisticallyUnchokedNeighbor();
+//						if(temp != null){
+//							try {
+//								if(!peer.getConnectionMap().get(temp.getPeerInfo().getId()).getRequestSocket().isClosed()
+//										&& !peer.getCurrentlyUnchokedNeighborIds().contains(temp.getPeerInfo().getId())){
+//									outputstream = peer.getConnectionMap().get(temp.getPeerInfo().getId()).getRequestSocket().getOutputStream();
+//									outputstream.write(ChokeMessage.createChokeMessage());
+//									peer.getConnectionMap().get(temp.getPeerInfo().getId()).setChokedbyMe(true);
+//								}
+//							} catch (IOException e) {
+//								e.printStackTrace();
+//							}
+//						}
+//						peer.setOptimisticallyUnchokedNeighbor(neighborToUnchoke);
+//						System.out.println("Optimistically unchoked - " + neighborToUnchoke.getPeerInfo().getId());
+//						try {
+//							if(!peer.getConnectionMap().get(neighborToUnchoke.getPeerInfo().getId()).getRequestSocket().isClosed()) {
+//								outputstream = peer.getConnectionMap().get(neighborToUnchoke.getPeerInfo().getId()).getRequestSocket().getOutputStream();
+//							
+//								peer.getLogger().optimUnchokedNeighbor(peer.getPeerInfo().getId(), neighborToUnchoke.getPeerInfo().getId());
+//							
+//								outputstream.write(UnchokeMessage.createUnchokeMessage());
+//								
+//								peer.getConnectionMap().get(neighborToUnchoke.getPeerInfo().getId()).setChokedbyMe(false);
+//							}
+//
+//						} catch (IOException e) {
+//							e.printStackTrace();
+//						}
+//
+//						previousOptimisticUnchokeTime = System.currentTimeMillis();
+//
+//					}
+//					
+//				}
+//			}
 		}
 
 		//synchronized really needed?
 		private Neighbor getChokedNeighborRandomly(Vector<Neighbor> interestedNeighbors) {
 			List<Neighbor> interestedChokedNeighbors = new ArrayList<>(interestedNeighbors);
-			for (Neighbor neighbor : interestedNeighbors) {
-				if (!neighbor.isChokedbyMe()) {
-					interestedChokedNeighbors.remove(neighbor);
-				}
-			}
+			interestedChokedNeighbors.removeAll(peer.getCurrentlyUnchokedNeighborIds());
 			
 			if(interestedChokedNeighbors.size()==0)
 				return null;
