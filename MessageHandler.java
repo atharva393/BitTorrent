@@ -6,11 +6,9 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Vector;
-import java.util.concurrent.TimeUnit;
 
 import messages.HaveMessage;
 import messages.InterestedMessage;
@@ -138,7 +136,12 @@ public class MessageHandler implements Runnable {
 	private void handlePieceMsg(byte[] pieceInfo) {
 		//delete entry from requestmap
 		int index = ByteBuffer.wrap(pieceInfo, 0, 4).getInt();
-		fileManager.getRequestPieceMap().remove(neighborPeerId);
+		
+		if(fileManager.getRequestPieceMap().get(neighborPeerId) == index)
+			fileManager.getRequestPieceMap().remove(neighborPeerId);
+		else
+			System.out.println("Received piece " + index + " from " + neighborPeerId + " but was expecting "  + fileManager.getRequestPieceMap().get(neighborPeerId));
+		
 		connectionMap.get(neighborPeerId).incrementNumberOfReceivedPieces();
 		fileManager.writePieceToFile(index, Arrays.copyOfRange(pieceInfo, 4, pieceInfo.length));
 		

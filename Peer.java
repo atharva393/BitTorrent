@@ -3,7 +3,6 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -89,7 +88,7 @@ public class Peer {
 			byte[] response = new byte[32];
 			socket.getInputStream().read(response);
 
-			System.out.println(new String(response));
+			System.out.println("Handshake msg : " + new String(response));
 
 			if (HandshakeMessage.getPeerID_Handshake_Message(response) == neighborPeer.getPeerInfo().getId()) {
 				
