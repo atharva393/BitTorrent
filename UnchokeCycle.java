@@ -77,7 +77,8 @@ public class UnchokeCycle {
 					for (int i : toChokeList) {
 						// send choked msg
 						try {
-							if(!peer.getConnectionMap().get(i).getRequestSocket().isClosed()) {
+							if(!peer.getConnectionMap().get(i).getRequestSocket().isClosed()
+									&& !(peer.getOptimisticallyUnchokedNeighbor().getPeerInfo().getId() == i)) {
 								outputStream = peer.getConnectionMap().get(i).getRequestSocket().getOutputStream();
 								outputStream.write(ChokeMessage.createChokeMessage());
 								peer.getConnectionMap().get(i).setChokedbyMe(true);
@@ -154,13 +155,14 @@ public class UnchokeCycle {
 			while (!isCycleStopped()) {
 				if ((System.currentTimeMillis() - previousOptimisticUnchokeTime) >= optimisticUnchokingTimeInterval * 1000) {
 
-					Neighbor neighborToUnchoke = getChokedNeighborRandomly(peer.getInterestedNeighbors());
+					Neighbor neighborToUnchoke = getChokedNeighborRandomly(new Vector<>(peer.getInterestedNeighbors()));
 					
 					if (neighborToUnchoke != null) {
 						Neighbor temp = peer.getOptimisticallyUnchokedNeighbor();
 						if(temp != null){
 							try {
-								if(!peer.getConnectionMap().get(temp.getPeerInfo().getId()).getRequestSocket().isClosed()){
+								if(!peer.getConnectionMap().get(temp.getPeerInfo().getId()).getRequestSocket().isClosed()
+										&& !peer.getCurrentlyUnchokedNeighborIds().contains(temp.getPeerInfo().getId())){
 									outputstream = peer.getConnectionMap().get(temp.getPeerInfo().getId()).getRequestSocket().getOutputStream();
 									outputstream.write(ChokeMessage.createChokeMessage());
 									peer.getConnectionMap().get(temp.getPeerInfo().getId()).setChokedbyMe(true);
@@ -178,7 +180,8 @@ public class UnchokeCycle {
 								peer.getLogger().optimUnchokedNeighbor(peer.getPeerInfo().getId(), neighborToUnchoke.getPeerInfo().getId());
 							
 								outputstream.write(UnchokeMessage.createUnchokeMessage());
-								peer.getConnectionMap().get(temp.getPeerInfo().getId()).setChokedbyMe(false);
+								peer.getCurrentlyUnchokedNeighborIds().add(peer.getPeerInfo().getId());
+								peer.getConnectionMap().get(neighborToUnchoke.getPeerInfo().getId()).setChokedbyMe(false);
 							}
 
 						} catch (IOException e) {
@@ -194,7 +197,7 @@ public class UnchokeCycle {
 		}
 
 		//synchronized really needed?
-		private synchronized Neighbor getChokedNeighborRandomly(Vector<Neighbor> interestedNeighbors) {
+		private Neighbor getChokedNeighborRandomly(Vector<Neighbor> interestedNeighbors) {
 			List<Neighbor> interestedChokedNeighbors = new ArrayList<>(interestedNeighbors);
 			for (Neighbor neighbor : interestedNeighbors) {
 				if (!neighbor.isChokedbyMe()) {

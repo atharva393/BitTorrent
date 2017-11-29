@@ -137,10 +137,7 @@ public class MessageHandler implements Runnable {
 		//delete entry from requestmap
 		int index = ByteBuffer.wrap(pieceInfo, 0, 4).getInt();
 		
-		if(fileManager.getRequestPieceMap().get(neighborPeerId) == index)
-			fileManager.getRequestPieceMap().remove(neighborPeerId);
-		else
-			System.out.println("Received piece " + index + " from " + neighborPeerId + " but was expecting "  + fileManager.getRequestPieceMap().get(neighborPeerId));
+		fileManager.getRequestPieceMap().remove(neighborPeerId);
 		
 		connectionMap.get(neighborPeerId).incrementNumberOfReceivedPieces();
 		fileManager.writePieceToFile(index, Arrays.copyOfRange(pieceInfo, 4, pieceInfo.length));
