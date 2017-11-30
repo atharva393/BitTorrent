@@ -3,6 +3,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -204,13 +205,24 @@ public class UnchokeCycle {
 			//can not remove integers from the list of neighbors
 			//interestedChokedNeighbors.removeAll(peer.getCurrentlyUnchokedNeighborIds());
 			
-			for(Map.Entry<Integer, Neighbor> neighbor : peer.getConnectionMap().entrySet()) {
+			Iterator<Map.Entry<Integer, Neighbor>> it = peer.getConnectionMap().entrySet().iterator();
+			
+			while(it.hasNext()){
 				
+				Map.Entry<Integer, Neighbor> neighbor = (Map.Entry<Integer, Neighbor>) it.next();
 				if(neighbor.getValue().isInterested() && neighbor.getValue().isChokedbyMe()) {
 					interestedChokedNeighbors.add(neighbor.getValue());
 				}
 				
 			}
+			//throws concurrent modification exception
+			/*for(Map.Entry<Integer, Neighbor> neighbor : peer.getConnectionMap().entrySet()) {
+				
+				if(neighbor.getValue().isInterested() && neighbor.getValue().isChokedbyMe()) {
+					interestedChokedNeighbors.add(neighbor.getValue());
+				}
+				
+			}*/
 
 			if(interestedChokedNeighbors.size()==0)
 				return null;

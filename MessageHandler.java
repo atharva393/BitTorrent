@@ -152,6 +152,7 @@ public class MessageHandler implements Runnable {
 				neighbor.getValue().setAmInterested(false);
 				try {
 					neighbor.getValue().getRequestSocket().getOutputStream().write(NotInterestedMessage.createNotInterestedMessage());
+					neighbor.getValue().setAmInterested(false);
 				} catch (IOException e) {
 					System.out.println("Error occurred while sending not interested msg from handlePiecemsg method");
 					e.printStackTrace();
@@ -192,6 +193,8 @@ public class MessageHandler implements Runnable {
 			try {
 				interestedMessage = InterestedMessage.createInterestedMessage();
 				outputStream.write(interestedMessage);
+				//this line was missing. Mandatory because we check this flag b4 requesting piece after getting unchoked.
+				connectionMap.get(neighborPeerId).setAmInterested(true);
 				if(!connectionMap.get(neighborPeerId).isChokingMe())
 					sendPieceRequest(index);
 			} catch (IOException e) {
@@ -200,6 +203,10 @@ public class MessageHandler implements Runnable {
 		}
 		
 		if(connectionMap.get(neighborPeerId).getNeighborBitField().hasAll()){
+			//set interested flag to false because neighbor anyways has the complete file. 
+			connectionMap.get(neighborPeerId).setInterested(false);
+			if(interestedNeighbors.contains(connectionMap.get(neighborPeerId)))
+				interestedNeighbors.remove(connectionMap.get(neighborPeerId));
 			checkIfEveryoneHasFile();
 		}
 	}
