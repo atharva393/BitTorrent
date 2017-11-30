@@ -77,10 +77,6 @@ public class UnchokeCycle {
 					Neighbor oldOptimNeighbor = peer.getOptimisticallyUnchokedNeighbor();
 					for (int i : toChokeList) {
 						// send choked msg
-						
-						if(oldOptimNeighbor != null && oldOptimNeighbor.getPeerInfo().getId() != i)
-							continue;
-						
 						try {
 							if(!peer.getConnectionMap().get(i).getRequestSocket().isClosed()){
 									//&& (oldOptimNeighbor != null && oldOptimNeighbor.getPeerInfo().getId() != i)) {
@@ -163,7 +159,7 @@ public class UnchokeCycle {
 					Neighbor neighborToUnchoke = getChokedNeighborRandomly(new Vector<>(peer.getInterestedNeighbors()));
 					
 					if (neighborToUnchoke != null) {
-						Neighbor temp = peer.getOptimisticallyUnchokedNeighbor();
+						/*Neighbor temp = peer.getOptimisticallyUnchokedNeighbor();
 						if(temp != null){
 							try {
 								if(!peer.getConnectionMap().get(temp.getPeerInfo().getId()).getRequestSocket().isClosed()
@@ -175,7 +171,7 @@ public class UnchokeCycle {
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
-						}
+						}*/
 						peer.setOptimisticallyUnchokedNeighbor(neighborToUnchoke);
 						System.out.println("Optimistically unchoked - " + neighborToUnchoke.getPeerInfo().getId());
 						try {
@@ -187,7 +183,7 @@ public class UnchokeCycle {
 								outputstream.write(UnchokeMessage.createUnchokeMessage());
 								
 								peer.getConnectionMap().get(neighborToUnchoke.getPeerInfo().getId()).setChokedbyMe(false);
-								//peer.getCurrentlyUnchokedNeighborIds().add(neighborToUnchoke.getPeerInfo().getId());
+								peer.getCurrentlyUnchokedNeighborIds().add(neighborToUnchoke.getPeerInfo().getId());
 							}
 
 						} catch (IOException e) {
@@ -204,8 +200,9 @@ public class UnchokeCycle {
 
 		//synchronized really needed?
 		private Neighbor getChokedNeighborRandomly(Vector<Neighbor> interestedNeighbors) {
-			
-			List<Neighbor> interestedChokedNeighbors = new ArrayList<>(interestedNeighbors);
+			List<Neighbor> interestedChokedNeighbors = new ArrayList<>();
+			//can not remove integers from the list of neighbors
+			//interestedChokedNeighbors.removeAll(peer.getCurrentlyUnchokedNeighborIds());
 			
 			for(Map.Entry<Integer, Neighbor> neighbor : peer.getConnectionMap().entrySet()) {
 				
@@ -214,7 +211,7 @@ public class UnchokeCycle {
 				}
 				
 			}
-			
+
 			if(interestedChokedNeighbors.size()==0)
 				return null;
 			
