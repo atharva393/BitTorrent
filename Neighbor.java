@@ -30,7 +30,7 @@ public class Neighbor {
 			e.printStackTrace();
 		}
 		this.amInterested = false;
-		this.isChokedbyMe = true;
+		this.isChokedbyMe = false;
 		this.isChokingMe = true;
 		this.isInterested = false;
 		this.neighborBitField = new CustomBitField();

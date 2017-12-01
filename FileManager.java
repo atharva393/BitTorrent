@@ -21,7 +21,7 @@ public class FileManager {
 	
 	FileManager(PeerInfo peerInfo){
 		CommonConfig commonConfig = CommonConfig.getCommonProperties();
-		customBitField = new CustomBitField((int) Math.ceil((commonConfig.getFileSize() * 1.0)/commonConfig.getPieceSize()));
+		customBitField = new CustomBitField();
 		if(peerInfo.isHasFile()) {
 			this.customBitField.setAll();
 		}

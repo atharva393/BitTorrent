@@ -38,7 +38,7 @@ public class Peer {
 		Thread server = new Thread(new Server(this));
 		server.start();
 		//start unchokecycle
-		unchokeCycle.beginCycle();
+		//unchokeCycle.beginCycle();
 	}
 
 	public PeerInfo getPeerInfo() {
@@ -91,6 +91,11 @@ public class Peer {
 			System.out.println("Handshake msg : " + new String(response));
 
 			if (HandshakeMessage.getPeerID_Handshake_Message(response) == neighborPeer.getPeerInfo().getId()) {
+				
+				if(unchokeCycle.isCycleStopped()){
+					unchokeCycle.setCycleStopped(false);
+					unchokeCycle.beginCycle();
+				}
 				
 				logger.outgoingTcpConn(peerInfo.getId(), neighborPeer.getPeerInfo().getId());
 				

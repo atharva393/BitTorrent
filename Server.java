@@ -40,8 +40,8 @@ public class Server implements Runnable {
 		try {
 			while (true) {
 				connectionSocket = welcomingSocket.accept();
-				OutputStream outputStream = connectionSocket.getOutputStream();
-				InputStream inputStream = connectionSocket.getInputStream();
+				DataOutputStream outputStream = new DataOutputStream(connectionSocket.getOutputStream());
+				DataInputStream inputStream = new DataInputStream(connectionSocket.getInputStream());
 
 				byte[] msg = new byte[32];
 				inputStream.read(msg, 0, 32);

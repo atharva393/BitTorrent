@@ -5,29 +5,24 @@ import java.util.BitSet;
  *
  */
 public class CustomBitField {
-	private BitSet bitSet = new BitSet();
-	private int numberOfPieces = (int) Math.ceil((CommonConfig.getCommonProperties().getFileSize() * 1.0) / CommonConfig.getCommonProperties().getPieceSize());
 	
-	public BitSet getBitSet() {
-		return bitSet;
-	}
+	private int numberOfPieces = (int) Math.ceil((CommonConfig.getCommonProperties().getFileSize() * 1.0) / CommonConfig.getCommonProperties().getPieceSize());
+	private BitSet bitSet = new BitSet(numberOfPieces);
 
 	public void setBitSet(BitSet bitSet) {
 		this.bitSet = bitSet;
 	}
-
 	
-	public CustomBitField() {
-		
-	}
-	
-	public CustomBitField(int numberOfPieces) {
-		this.bitSet = new BitSet(numberOfPieces);
-		this.numberOfPieces = numberOfPieces;
+	public BitSet getBitSet() {
+		return bitSet;
 	}
 	
 	public synchronized void set(int index) {
 		bitSet.set(index);
+	}
+	
+	public synchronized boolean get(int index) {
+		return bitSet.get(index);
 	}
 
 	public synchronized void setAll() {
