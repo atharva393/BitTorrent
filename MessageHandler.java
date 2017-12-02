@@ -71,7 +71,6 @@ public class MessageHandler implements Runnable {
 					if(msgLength == 1){
 						handleChokeMsg();
 					} else{
-						System.out.println("reached here");
 						socket.close();
 						if(connectionMap.size() == peerInfoMap.size()-1)
 							System.exit(0);
@@ -94,7 +93,6 @@ public class MessageHandler implements Runnable {
 					handleBitFieldMsg(BitSet.valueOf(inputStreamByte));
 					break;
 				case 6:
-					//System.out.println("Request msg received by " + neighborPeerId);
 					handleRequestPieceMsg(ByteBuffer.wrap(inputStreamByte, 0, 4).getInt());
 					break;
 				case 7:
@@ -111,11 +109,9 @@ public class MessageHandler implements Runnable {
 	private void handleRequestPieceMsg(int index) {
 		if(!fileManager.getCustomBitField().get(index))
 			return;
-		//System.out.println("Request msg received by " + neighborPeerId + " for " + index);
 		try {
 			byte[] piece = fileManager.readPieceFromFile(index);
 			outputStream.write(PieceMessage.createPieceMessage(index, piece));
-			
 		} catch(FileNotFoundException e){
 			System.out.println("File not found");
 		} catch (IOException e) {
@@ -161,7 +157,6 @@ public class MessageHandler implements Runnable {
 				neighbor.getValue().setAmInterested(false);
 				try {
 					new DataOutputStream(neighbor.getValue().getRequestSocket().getOutputStream()).write(NotInterestedMessage.createNotInterestedMessage());
-					
 					neighbor.getValue().setAmInterested(false);
 				} catch (IOException e) {
 					System.out.println("Error occurred while sending not interested msg from handlePiecemsg method");
@@ -173,7 +168,6 @@ public class MessageHandler implements Runnable {
 		if(fileManager.getCustomBitField().hasAll()){
 			peer.getPeerInfo().setHasFile(true);
 			peer.getLogger().downloadeComplete(peer.getPeerInfo().getId());
-			System.out.println("last have "+index);
 			checkIfEveryoneHasFile();			
 		} else{
 			sendPieceRequest();
@@ -184,9 +178,7 @@ public class MessageHandler implements Runnable {
 
 		for(Map.Entry<Integer, Neighbor> entry : connectionMap.entrySet()){
 			try {
-				System.out.println("piece "+index+". have sent to "+entry.getKey());
 				new DataOutputStream(entry.getValue().getRequestSocket().getOutputStream()).write(HaveMessage.createHaveMessage(index));
-				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -205,7 +197,6 @@ public class MessageHandler implements Runnable {
 			try {
 				interestedMessage = InterestedMessage.createInterestedMessage();
 				outputStream.write(interestedMessage);
-				
 				//this line was missing. Mandatory because we check this flag b4 requesting piece after getting unchoked.
 				connectionMap.get(neighborPeerId).setAmInterested(true);
 				if(!connectionMap.get(neighborPeerId).isChokingMe())
@@ -253,7 +244,6 @@ public class MessageHandler implements Runnable {
 				fileManager.getRequestPieceMap().put(neighborPeerId, index);
 				byte[] requestMsg = RequestMessage.createRequestMessage(index);
 				outputStream.write(requestMsg);
-				
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -281,12 +271,10 @@ public class MessageHandler implements Runnable {
 				connectionMap.get(neighborPeerId).setAmInterested(true);
 				byte[] interestedMessage = InterestedMessage.createInterestedMessage();
 				outputStream.write(interestedMessage);
-				
 			} else {
 				connectionMap.get(neighborPeerId).setAmInterested(false);
 				byte[] notInterestedMessage = NotInterestedMessage.createNotInterestedMessage();
 				outputStream.write(notInterestedMessage);
-				
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -329,19 +317,16 @@ public class MessageHandler implements Runnable {
 		if(fileManager.getCustomBitField().hasAll()){
 			for(Map.Entry<Integer, Neighbor> entry : connectionMap.entrySet()){
 				if(!entry.getValue().getNeighborBitField().hasAll()){
-					System.out.println("bacha hai "+entry.getKey());
 					return;
 				}
 			}
 
-			System.out.println("Stopping the unchoking cycles.");
 			unchokeCycle.setCycleStopped(true);
 						
 			for(Map.Entry<Integer, Neighbor> entry : connectionMap.entrySet()){
 				try {
 					if(!entry.getValue().getRequestSocket().isClosed())
 					{
-						System.out.println("Closing the socket for " + entry.getKey());
 						entry.getValue().getRequestSocket().close();
 						interestedNeighbors.remove(entry.getValue());
 						peer.getCurrentlyUnchokedNeighborIds().remove(entry.getKey());

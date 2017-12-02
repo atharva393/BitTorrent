@@ -1,6 +1,5 @@
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -89,7 +88,6 @@ public class UnchokeCycle {
 									//&& (oldOptimNeighbor != null && oldOptimNeighbor.getPeerInfo().getId() != i)) {
 								outputStream = new DataOutputStream(peer.getConnectionMap().get(i).getRequestSocket().getOutputStream());
 								outputStream.write(ChokeMessage.createChokeMessage());
-								
 								peer.getConnectionMap().get(i).setChokedbyMe(true);
 							}
 						} catch (IOException e) {
@@ -108,7 +106,6 @@ public class UnchokeCycle {
 								outputStream = new DataOutputStream(peer.getConnectionMap().get(i).getRequestSocket()
 									.getOutputStream());
 								outputStream.write(UnchokeMessage.createUnchokeMessage());
-								
 								peer.getConnectionMap().get(i).setChokedbyMe(false);
 							}
 						} catch (IOException e) {
@@ -175,7 +172,6 @@ public class UnchokeCycle {
 										&& !peer.getCurrentlyUnchokedNeighborIds().contains(temp.getPeerInfo().getId())){
 									outputstream = new DataOutputStream(peer.getConnectionMap().get(temp.getPeerInfo().getId()).getRequestSocket().getOutputStream());
 									outputstream.write(ChokeMessage.createChokeMessage());
-									
 									peer.getConnectionMap().get(temp.getPeerInfo().getId()).setChokedbyMe(true);
 								}
 							} catch (IOException e) {

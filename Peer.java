@@ -88,7 +88,7 @@ public class Peer {
 			byte[] response = new byte[32];
 			socket.getInputStream().read(response);
 
-			System.out.println("Handshake msg : " + new String(response));
+			System.out.println("Handshake msg : " + new String(response, 0, 14));
 
 			if (HandshakeMessage.getPeerID_Handshake_Message(response) == neighborPeer.getPeerInfo().getId()) {
 				
